@@ -10,7 +10,6 @@ Source0: http://accounts-sso.googlecode.com/files/%{_name}-%{version}.tar.bz2
 BuildRequires: doxygen
 #BuildRequires: graphviz
 BuildRequires: pkgconfig(QtCore)
-BuildRequires: libcreds2-devel
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(libcryptsetup)
 BuildRequires: pkgconfig(accounts-qt)
