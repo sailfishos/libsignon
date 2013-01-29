@@ -22,6 +22,7 @@ BuildRequires: fdupes
 #       - add support for pacrunner (NEMO#524)
 #       - check if we have usable testcases
 Patch0: 0001-include-QDebug-to-remotepluginprocess.patch
+Patch1: 0002-libsignon-disable-multilib.patch
 
 %description
 %{summary}.
@@ -126,6 +127,7 @@ Doxygen-generated HTML documentation for the signon-qt
 %prep
 %setup -q -n %{_name}-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 qmake %{_name}.pro

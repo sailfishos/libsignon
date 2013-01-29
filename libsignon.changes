@@ -1,3 +1,6 @@
+* Tue Jan 29 2013 Oleg Girko <ol+mer@infoserver.ru> - 8.43
+- Disable multilib for x86_64 architecture.
+
 * Tue Oct 16 2012 Bernd Wachter <bernd.wachter@jollamobile.com> - 8.43
 - Update to latest upstream
 - Clean up package dependencies
