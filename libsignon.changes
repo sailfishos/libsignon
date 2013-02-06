@@ -1,5 +1,11 @@
+* Wed Feb 6 2013 Valerio Valerio <valerio.valerio@jollamobile.com> - 8.46
+- Update to version 8.46
+
 * Tue Jan 29 2013 Oleg Girko <ol+mer@infoserver.ru> - 8.43
 - Disable multilib for x86_64 architecture.
+
+* Thu Dec 20 2012 John Brooks <john.brooks@jollamobile.com> - 8.43
+- Merge libsignon-passwordplugin into libsignon package
 
 * Tue Oct 16 2012 Bernd Wachter <bernd.wachter@jollamobile.com> - 8.43
 - Update to latest upstream
