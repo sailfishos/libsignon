@@ -9,7 +9,6 @@ URL: https://code.google.com/p/accounts-sso.signond/
 Source: %{_name}-%{version}.tar.bz2
 BuildRequires: doxygen
 BuildRequires: pkgconfig(QtCore)
-BuildRequires: libcreds2-devel
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(libcryptsetup)
 BuildRequires: pkgconfig(accounts-qt)
