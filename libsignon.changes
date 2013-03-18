@@ -1,3 +1,7 @@
+* Thu Mar 18 2013 Martin Kampas <martin.kampas@tieto.com> - 8.64
+- MER#683 - signon-8.46.tar.bz2 does not provide any automated tests
+- Add signon-8.46-install-tests.patch
+
 * Wed Feb 6 2013 Valerio Valerio <valerio.valerio@jollamobile.com> - 8.46
 - Update to version 8.46
 

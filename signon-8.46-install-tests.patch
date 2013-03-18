@@ -1,0 +1,231 @@
+From 0154de069594ba86cd7bb5c51b276cab89b6ad14 Mon Sep 17 00:00:00 2001
+From: Martin Kampas <martin.kampas@tieto.com>
+Date: Mon, 18 Mar 2013 16:50:19 +0100
+Subject: [PATCH] Install tests, add tests definition
+
+Signed-off-by: Martin Kampas <martin.kampas@tieto.com>
+---
+ tests/create-tests-definition.pro         |  23 +++++
+ tests/create-tests-definition.sh          | 139 ++++++++++++++++++++++++++++++
+ tests/pluginproxytest/pluginproxytest.pro |   1 +
+ tests/tests.pri                           |   9 ++
+ tests/tests.pro                           |   1 +
+ 5 files changed, 173 insertions(+)
+ create mode 100644 tests/create-tests-definition.pro
+ create mode 100755 tests/create-tests-definition.sh
+
+diff --git a/tests/create-tests-definition.pro b/tests/create-tests-definition.pro
+new file mode 100644
+index 0000000..2a9c409
+--- /dev/null
++++ b/tests/create-tests-definition.pro
+@@ -0,0 +1,23 @@
++include( tests.pri )
++
++# added by default in tests.pri
++INSTALLS -= target
++
++# dummy
++TEMPLATE = subdirs
++
++create_tests_definition.target = tests.xml
++create_tests_definition.commands = \
++        $${PWD}/create-tests-definition.sh $${TESTS_INSTALL_PREFIX} > tests.xml
++create_tests_definition.CONFIG = phony
++
++make_default.CONFIG = phony
++make_default.depends += create_tests_definition
++
++QMAKE_EXTRA_TARGETS += create_tests_definition make_default
++
++tests_definition.path = $${TESTS_INSTALL_PREFIX}
++tests_definition.files = tests.xml
++tests_definition.depends = tests.xml
++tests_definition.CONFIG += no_check_exist
++INSTALLS += tests_definition
+diff --git a/tests/create-tests-definition.sh b/tests/create-tests-definition.sh
+new file mode 100755
+index 0000000..b3568d3
+--- /dev/null
++++ b/tests/create-tests-definition.sh
+@@ -0,0 +1,139 @@
++#!/bin/sh
++
++test_flag()
++{
++    FLAGS="${1?}"
++    FLAG="${2?}"
++    echo "${FLAGS}" |tr ',' '\n' |grep -q --line-regexp -e "${FLAG}"
++}
++
++fmt_test_case()
++{
++    EXECUTABLE="${1?}"
++    F_NAME="${2?}"
++    CASE_TYPE="${3?}"
++    CASE_LEVEL="${4?}"
++
++    EXEC_BASE_NAME="`basename "${EXECUTABLE}"`"
++
++    cat <<END
++      <case name="${EXEC_BASE_NAME}-${F_NAME:-ALL}" type="${CASE_TYPE}" level="${CASE_LEVEL}">
++        <description>${EXEC_BASE_NAME}-${F_NAME:-ALL}</description>
++        <step>${TESTS_INSTALL_DIR}/${EXEC_BASE_NAME} ${F_NAME}</step>
++      </case>
++END
++}
++
++generate_test_cases()
++{
++    EXECUTABLE="${1?}"
++    CASE_TYPE="${2?}"
++    CASE_LEVEL="${3?}"
++    FLAGS="${4}"
++
++    F_NAMES="`${EXECUTABLE} -functions`" || return 1
++
++    if test_flag "${FLAGS}" "single-case"
++    then
++        fmt_test_case "${EXECUTABLE}" "" "${CASE_TYPE}" "${CASE_LEVEL}"
++    else
++        for f_name in ${F_NAMES}
++        do
++            f_name="${f_name/(*)/}"
++            fmt_test_case "${EXECUTABLE}" "${f_name}" "${CASE_TYPE}" "${CASE_LEVEL}"
++        done
++    fi
++}
++
++generate_test_set()
++{
++    EXECUTABLE="${1?}"
++    FEATURE="${2?}"
++    CASE_TYPE="${3?}"
++    CASE_LEVEL="${4?}"
++    FLAGS="${5}"
++
++    EXEC_BASE_NAME="`basename "${EXECUTABLE}"`"
++
++    cat <<END
++    <set name="${TESTS_INSTALL_DIR}/${EXEC_BASE_NAME}" feature="${FEATURE}">
++      <pre_steps>
++        <step>
++          export SSO_LOGGING_LEVEL=2
++          export SSO_LOGGING_OUTPUT="stdout"
++          export SSO_STORAGE_PATH="/tmp"
++          export SSO_DAEMON_TIMEOUT=5
++          export SSO_IDENTITY_TIMEOUT=5
++          export SSO_AUTHSESSION_TIMEOUT=5
++
++          while ps -C signond &amp;>/dev/null; do pkill signond; sleep 1; done
++
++          # Redirecting output to file prevents receiving SIGHUP which leads to
++          # server restart and causes certain test cases to fail.
++          signond 1>/tmp/tests-libsignond-signond.out 2>&amp;1 &amp;
++
++          sleep 2
++        </step>
++      </pre_steps>
++`generate_test_cases "${EXECUTABLE}" "${CASE_TYPE}" "${CASE_LEVEL}" "${FLAGS}"`
++      <environments>
++        <scratchbox>true</scratchbox>
++        <hardware>true</hardware>
++      </environments>
++      <get>
++        <file delete_after="true">/tmp/tests-libsignond-signond.out</file>
++      </get>
++    </set>
++END
++}
++
++TESTS_INSTALL_DIR="${1?}"
++HAVE_AEGIS="${2:-false}"
++
++set -o errexit -o errtrace
++trap "kill -QUIT $$" ERR
++trap "exit 1" QUIT
++
++cat <<END
++<?xml version="1.0" encoding="ISO-8859-1"?>
++<testdefinition version="1.0">
++
++  <suite name="libsignon-qt-tests" domain="Accounts and SSO">
++    <description>Signon Qt Client Library Tests</description>
++
++`generate_test_set libsignon-qt-tests/libsignon-qt-tests \
++    "SSO API" "Functional" "Component" "single-case"`
++
++`${HAVE_AEGIS} || echo "    <!-- AEGIS not available on this platform"`
++`generate_test_set libsignon-qt-tests/libsignon-qt-untrusted-tests \
++    "SSO API" "Security" "Component" "single-case"`
++`${HAVE_AEGIS} || echo "    -->"`
++
++  </suite>
++
++
++  <suite name="signon-passwordplugin-tests" domain="Accounts and SSO">
++
++`generate_test_set passwordplugintest/signon-passwordplugin-tests \
++    "Password" "Functional" "Component"`
++
++  </suite>
++
++
++  <suite name="signond" domain="Accounts and SSO">
++
++`generate_test_set signond-tests/signon-tests \
++    "SSO CORE" "FIXME" "FIXME" "single-case"`
++
++  </suite>
++
++
++  <suite name="signon-testpluginproxy" domain="Accounts and SSO">
++
++`generate_test_set pluginproxytest/testpluginproxy \
++    "FIXME" "FIXME" "FIXME" "single-case"`
++
++  </suite>
++
++</testdefinition>
++END
+diff --git a/tests/pluginproxytest/pluginproxytest.pro b/tests/pluginproxytest/pluginproxytest.pro
+index 597fc04..1f2dd4d 100644
+--- a/tests/pluginproxytest/pluginproxytest.pro
++++ b/tests/pluginproxytest/pluginproxytest.pro
+@@ -14,6 +14,7 @@ LIBS += \
+ 
+ QMAKE_LIBDIR += \
+     $${TOP_BUILD_DIR}/lib/signond/SignOn
++QMAKE_RPATHDIR = $${QMAKE_LIBDIR}
+ 
+ DEFINES += SIGNOND_TRACE
+ DEFINES += SIGNON_PLUGIN_TRACE
+diff --git a/tests/tests.pri b/tests/tests.pri
+index 4520fda..17218a6 100644
+--- a/tests/tests.pri
++++ b/tests/tests.pri
+@@ -5,3 +5,12 @@ RUN_WITH_SIGNOND = "BUILDDIR=$$TOP_BUILD_DIR SRCDIR=$$TOP_SRC_DIR $$TOP_SRC_DIR/
+ 
+ QMAKE_EXTRA_TARGETS += check
+ 
++# Addresses Issue #96: [signond] fail to install when built with custom prefix
++contains(INSTALL_PREFIX, /usr) {
++        TESTS_INSTALL_PREFIX = /opt/tests/libsignon
++} else {
++        TESTS_INSTALL_PREFIX = $${INSTALL_PREFIX}/opt/tests/libsignon
++}
++
++target.path = $${TESTS_INSTALL_PREFIX}
++INSTALLS += target
+diff --git a/tests/tests.pro b/tests/tests.pro
+index fbef5db..715a144 100644
+--- a/tests/tests.pro
++++ b/tests/tests.pro
+@@ -10,3 +10,4 @@ SUBDIRS += pluginproxytest/pluginproxytest.pro
+ SUBDIRS += libsignon-qt-tests/libsignon-qt-tests.pro
+ SUBDIRS += libsignon-qt-tests/libsignon-qt-untrusted-tests.pro
+ SUBDIRS += signond-tests/signond-tests.pro
++SUBDIRS += create-tests-definition.pro
+-- 
+1.8.1.5
+

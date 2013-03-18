@@ -19,6 +19,7 @@ Provides: libsignon-passwordplugin = %{version}-%{release}
 Obsoletes: libsignon-passwordplugin < %{version}-%{release}
 
 Patch0: 0001-libsignon-disable-multilib.patch
+Patch1: %{_name}-%{version}-install-tests.patch
 
 %description
 %{summary}.
@@ -102,9 +103,25 @@ Doxygen-generated HTML documentation for the signon-qt
 %{_docdir}/libsignon-qt/*
 
 
+%package tests
+Summary: Tests for signon
+Group: System/X11
+Requires: %{name} = %{version}-%{release}
+
+%description tests
+This package contains tests for signon
+
+%files tests
+%defattr(-,root,root,-)
+/opt/tests/%{name}
+
+
 %prep
 %setup -n %{_name}-%{version}
 %patch0 -p1
+%patch1 -p1
+
+chmod +x tests/create-tests-definition.sh
 
 %build
 qmake %{_name}.pro
