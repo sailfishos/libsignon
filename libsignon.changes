@@ -1,4 +1,7 @@
-* Thu Mar 18 2013 Martin Kampas <martin.kampas@tieto.com> - 8.64
+* Mon Apr 15 2013 Vesa Halttunen <vesa.halttunen@jollamobile.com> - 8.50
+- Update to version 8.50
+
+* Thu Mar 18 2013 Martin Kampas <martin.kampas@tieto.com> - 8.46
 - MER#683 - signon-8.46.tar.bz2 does not provide any automated tests
 - Add signon-8.46-install-tests.patch
 

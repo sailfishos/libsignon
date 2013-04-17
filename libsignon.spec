@@ -1,12 +1,11 @@
-%define _name signon
-Name: libsignon
-Version: 8.46
+Name: signon
+Version: 8.50
 Release: 2
 Summary: Single Sign On framework
 Group: System/Libraries
 License: LGPLv2.1
 URL: https://code.google.com/p/accounts-sso.signond/
-Source: %{_name}-%{version}.tar.bz2
+Source: %{name}-%{version}.tar.bz2
 BuildRequires: doxygen
 BuildRequires: pkgconfig(QtCore)
 BuildRequires: pkgconfig(dbus-1)
@@ -17,9 +16,13 @@ BuildRequires: fdupes
 
 Provides: libsignon-passwordplugin = %{version}-%{release}
 Obsoletes: libsignon-passwordplugin < %{version}-%{release}
+Provides: libsignon = %{version}-%{release}
+Obsoletes: libsignon < %{version}-%{release}
 
-Patch0: 0001-libsignon-disable-multilib.patch
-Patch1: %{_name}-%{version}-install-tests.patch
+Patch0: %{name}-%{version}-install-tests.patch
+Patch1: 0001-libsignon-disable-multilib.patch
+Patch2: 0002-libsignon-c++0x.patch
+Patch3: 0003-libsignon-documentation-path.patch
 
 %description
 %{summary}.
@@ -27,59 +30,103 @@ Patch1: %{_name}-%{version}-install-tests.patch
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
-%{_libdir}/*.so.*
+%{_libdir}/libsignon-extension.so.*
+%{_libdir}/libsignon-plugins-common.so.*
 %{_datadir}/dbus-1/services/*
 %config %{_sysconfdir}/signond.conf
 %{_libdir}/signon/libpasswordplugin.so
+
+%package -n libsignon-qt
+Summary: Single Sign On Qt library
+Group: System/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description -n libsignon-qt
+%{summary}
+
+%files -n libsignon-qt
+%defattr(-,root,root,-)
+%{_libdir}/libsignon-qt.so.*
+
+%post -n libsignon-qt -p /sbin/ldconfig
+%postun -n libsignon-qt -p /sbin/ldconfig
 
 %package testplugin
 Summary: Single Sign On test plugins
 Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
+Provides: libsignon-testplugin = %{version}-%{release}
+Obsoletes: libsignon-testplugin < %{version}-%{release}
 
 %description testplugin
 %{summary}
 
 %files testplugin
 %defattr(-,root,root,-)
-%{_libdir}/%{_name}/libssotest*.so
+%{_libdir}/%{name}/libssotest*.so
 
 
 %package exampleplugin
 Summary: Single Sign On example client
 Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
+Provides: libsignon-exampleplugin = %{version}-%{release}
+Obsoletes: libsignon-exampleplugin < %{version}-%{release}
 
 %description exampleplugin
 %{summary}
 
 %files exampleplugin
 %defattr(-,root,root,-)
-%{_libdir}/%{_name}/libexampleplugin.so
+%{_libdir}/%{name}/libexampleplugin.so
 
 
 %package devel
 Summary: Development files for signon
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
+Provides: libsignon-devel = %{version}-%{release}
+Obsoletes: libsignon-devel < %{version}-%{release}
 
 %description devel
 %{summary}
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/*
-%{_libdir}/*.so
+%{_includedir}/signond/*
+%{_includedir}/signon-extension/*
+%{_includedir}/signon-plugins/*
+%{_libdir}/libsignon-extension.so
+%{_libdir}/libsignon-plugins-common.so
 %{_libdir}/libsignon-plugins.a
-%exclude %{_libdir}/libsignon-qt.a
-%{_libdir}/pkgconfig/*
-%{_datadir}/qt4/mkspecs/*
+%{_libdir}/pkgconfig/signond.pc
+%{_libdir}/pkgconfig/signon-plugins.pc
+%{_libdir}/pkgconfig/signon-plugins-common.pc
+%{_libdir}/pkgconfig/SignOnExtension.pc
 %{_datadir}/dbus-1/interfaces/*
+
+
+%package -n libsignon-qt-devel
+Summary: Development files for libsignon-qt
+Group: Development/Libraries
+Requires: libsignon-qt = %{version}-%{release}
+
+%description -n libsignon-qt-devel
+%{summary}
+
+%files -n libsignon-qt-devel
+%defattr(-,root,root,-)
+%{_includedir}/signon-qt/*
+%{_libdir}/libsignon-qt.so
+%exclude %{_libdir}/libsignon-qt.a
+%{_libdir}/pkgconfig/libsignon-qt.pc
 
 
 %package doc
 Summary: Documentation for signon
 Group: Documentation
+Provides: libsignon-doc = %{version}-%{release}
+Obsoletes: libsignon-doc < %{version}-%{release}
 
 %description doc
 Doxygen-generated HTML documentation for the signon.
@@ -91,14 +138,14 @@ Doxygen-generated HTML documentation for the signon.
 %{_docdir}/signon-plugins/*
 
 
-%package qt-doc
+%package -n libsignon-qt-doc
 Summary: Documentation for signon-qt
 Group: Documentation
 
-%description qt-doc
+%description -n libsignon-qt-doc
 Doxygen-generated HTML documentation for the signon-qt
 
-%files qt-doc
+%files -n libsignon-qt-doc
 %defattr(-,root,root,-)
 %{_docdir}/libsignon-qt/*
 
@@ -107,6 +154,8 @@ Doxygen-generated HTML documentation for the signon-qt
 Summary: Tests for signon
 Group: System/X11
 Requires: %{name} = %{version}-%{release}
+Provides: libsignon-tests = %{version}-%{release}
+Obsoletes: libsignon-tests < %{version}-%{release}
 
 %description tests
 This package contains tests for signon
@@ -117,14 +166,16 @@ This package contains tests for signon
 
 
 %prep
-%setup -n %{_name}-%{version}
+%setup -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 chmod +x tests/create-tests-definition.sh
 
 %build
-qmake %{_name}.pro
+qmake %{name}.pro TESTDIR=/opt/tests/%{name} CONFIG+=install_tests
 make
 
 

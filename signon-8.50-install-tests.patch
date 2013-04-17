@@ -7,8 +7,6 @@ Signed-off-by: Martin Kampas <martin.kampas@tieto.com>
 ---
  tests/create-tests-definition.pro         |  23 +++++
  tests/create-tests-definition.sh          | 139 ++++++++++++++++++++++++++++++
- tests/pluginproxytest/pluginproxytest.pro |   1 +
- tests/tests.pri                           |   9 ++
  tests/tests.pro                           |   1 +
  5 files changed, 173 insertions(+)
  create mode 100644 tests/create-tests-definition.pro
@@ -30,7 +28,7 @@ index 0000000..2a9c409
 +
 +create_tests_definition.target = tests.xml
 +create_tests_definition.commands = \
-+        $${PWD}/create-tests-definition.sh $${TESTS_INSTALL_PREFIX} > tests.xml
++        $${PWD}/create-tests-definition.sh $${INSTALL_TESTDIR} > tests.xml
 +create_tests_definition.CONFIG = phony
 +
 +make_default.CONFIG = phony
@@ -38,7 +36,7 @@ index 0000000..2a9c409
 +
 +QMAKE_EXTRA_TARGETS += create_tests_definition make_default
 +
-+tests_definition.path = $${TESTS_INSTALL_PREFIX}
++tests_definition.path = $${INSTALL_TESTDIR}
 +tests_definition.files = tests.xml
 +tests_definition.depends = tests.xml
 +tests_definition.CONFIG += no_check_exist
@@ -188,35 +186,6 @@ index 0000000..b3568d3
 +
 +</testdefinition>
 +END
-diff --git a/tests/pluginproxytest/pluginproxytest.pro b/tests/pluginproxytest/pluginproxytest.pro
-index 597fc04..1f2dd4d 100644
---- a/tests/pluginproxytest/pluginproxytest.pro
-+++ b/tests/pluginproxytest/pluginproxytest.pro
-@@ -14,6 +14,7 @@ LIBS += \
- 
- QMAKE_LIBDIR += \
-     $${TOP_BUILD_DIR}/lib/signond/SignOn
-+QMAKE_RPATHDIR = $${QMAKE_LIBDIR}
- 
- DEFINES += SIGNOND_TRACE
- DEFINES += SIGNON_PLUGIN_TRACE
-diff --git a/tests/tests.pri b/tests/tests.pri
-index 4520fda..17218a6 100644
---- a/tests/tests.pri
-+++ b/tests/tests.pri
-@@ -5,3 +5,12 @@ RUN_WITH_SIGNOND = "BUILDDIR=$$TOP_BUILD_DIR SRCDIR=$$TOP_SRC_DIR $$TOP_SRC_DIR/
- 
- QMAKE_EXTRA_TARGETS += check
- 
-+# Addresses Issue #96: [signond] fail to install when built with custom prefix
-+contains(INSTALL_PREFIX, /usr) {
-+        TESTS_INSTALL_PREFIX = /opt/tests/libsignon
-+} else {
-+        TESTS_INSTALL_PREFIX = $${INSTALL_PREFIX}/opt/tests/libsignon
-+}
-+
-+target.path = $${TESTS_INSTALL_PREFIX}
-+INSTALLS += target
 diff --git a/tests/tests.pro b/tests/tests.pro
 index fbef5db..715a144 100644
 --- a/tests/tests.pro
