@@ -1,3 +1,6 @@
+* Thu May 02 2013 Carsten Munk <carsten.munk@jollamobile.com> - 8.50
+- Use %qmake5
+
 * Mon Apr 15 2013 Vesa Halttunen <vesa.halttunen@jollamobile.com> - 8.50
 - Update to version 8.50
 

@@ -95,7 +95,7 @@ Doxygen-generated HTML documentation for libsignon-qt5
 chmod +x tests/create-tests-definition.sh
 
 %build
-qmake %{_name}.pro TESTDIR=/opt/tests/%{_name} CONFIG+=install_tests
+%qmake5 %{_name}.pro TESTDIR=/opt/tests/%{_name} CONFIG+=install_tests
 make
 
 
