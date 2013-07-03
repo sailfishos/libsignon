@@ -24,6 +24,7 @@ Patch0: %{_name}-%{version}-install-tests.patch
 Patch1: 0001-libsignon-disable-multilib.patch
 Patch2: 0002-libsignon-c++0x.patch
 Patch3: 0003-libsignon-documentation-path.patch
+Patch4: 0004-Convert-QDBusArgument-session-parameters-to-QVariant.patch
 
 %description
 %{summary}.
@@ -91,6 +92,7 @@ Doxygen-generated HTML documentation for libsignon-qt5
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 chmod +x tests/create-tests-definition.sh
 

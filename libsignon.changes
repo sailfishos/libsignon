@@ -1,3 +1,6 @@
+* Thu June 27 2013 Chris Adams <chris.adams@jollamobile.com> - 8.50
+- Convert QDBusArgument session parameters to QVariantMap
+
 * Thu May 02 2013 Carsten Munk <carsten.munk@jollamobile.com> - 8.50
 - Use %qmake5
 

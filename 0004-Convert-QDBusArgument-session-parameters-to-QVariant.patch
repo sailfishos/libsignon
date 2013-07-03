@@ -1,0 +1,143 @@
+From 6ae17d718c3913f1a93078fb9aa1a28022e40cf9 Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Thu, 27 Jun 2013 19:21:45 +1000
+Subject: [PATCH] Convert QDBusArgument session parameters to QVariantMap
+
+Some QDBusArgument parameters are able to be converted to QVariantMap
+which can be serialized successfully.  This patch adds a (recursive)
+QDBusArgument expansion function to the BlobIOHandler class from
+libsignon-plugins-common which allows QVariantMap session data
+parameters to be sent to and received from signon plugins.
+---
+ .../signon-plugins-common/SignOn/blobiohandler.cpp |   55 +++++++++++++++++---
+ .../signon-plugins-common.pro                      |    1 +
+ tests/pluginproxytest/testpluginproxy.cpp          |   14 ++++-
+ 3 files changed, 61 insertions(+), 9 deletions(-)
+
+diff --git a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
+index 85222a8..a1022cc 100644
+--- a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
++++ b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
+@@ -23,6 +23,7 @@
+ 
+ #include "blobiohandler.h"
+ 
++#include <QDBusArgument>
+ #include <QBuffer>
+ #include <QDebug>
+ 
+@@ -131,20 +132,60 @@ void BlobIOHandler::readBlob()
+     }
+ }
+ 
++QVariantMap expandDBusArgumentValue(const QVariant &value, bool *success)
++{
++    // first, convert the QDBusArgument to a map
++    QDBusArgument dbusValue = value.value<QDBusArgument>();
++    QVariantMap converted;
++    if (dbusValue.currentType() == QDBusArgument::MapType) {
++        //Assume that all maps are a{sv}
++        converted = qdbus_cast<QVariantMap>(dbusValue);
++    } else {
++        *success = false;
++        return QVariantMap();
++    }
++
++    // Then, check each value of the converted map
++    // and if any QDBusArgument is a value, convert that.
++    QVariantMap returnValue;
++    QVariantMap::const_iterator i;
++    for (i = converted.constBegin(); i != converted.constEnd(); ++i) {
++        if (qstrcmp(i.value().typeName(), "QDBusArgument") == 0) {
++            QVariantMap convertedValue = expandDBusArgumentValue(i.value(), success);
++            if (success == false) {
++                //bail out to prevent error in serialization
++                return QVariantMap();
++            }
++            returnValue.insert(i.key(), convertedValue);
++        } else {
++            returnValue.insert(i.key(), i.value());
++        }
++    }
++
++    return returnValue;
++}
++
+ static QVariantMap filterOutComplexTypes(const QVariantMap &map)
+ {
+     QVariantMap filteredMap;
+     QVariantMap::const_iterator i;
+     for (i = map.constBegin(); i != map.constEnd(); i++) {
+-        /* QDBusArgument are complex types; there is no QDataStream
+-         * serialization for them, so keeping them in the map would make the
+-         * serialization fail for the whole map.
+-         * Therefore, skip them. */
+         if (qstrcmp(i.value().typeName(), "QDBusArgument") == 0) {
+-            BLAME() << "Found QDBusArgument in map; skipping.";
+-            continue;
++            bool success = true;
++            QVariantMap convertedMap = expandDBusArgumentValue(i.value(), &success);
++            if (success == false) {
++                /* QDBusArgument are complex types; there is no QDataStream
++                 * serialization for them, so keeping them in the map would
++                 * make the serialization fail for the whole map, if we are
++                 * unable to convert to a QVariantMap.
++                 * Therefore, skip them. */
++                BLAME() << "Found non-map QDBusArgument in data; skipping.";
++                continue;
++            }
++            filteredMap.insert(i.key(), convertedMap);
++        } else {
++            filteredMap.insert(i.key(), i.value());
+         }
+-        filteredMap.insert(i.key(), i.value());
+     }
+     return filteredMap;
+ }
+diff --git a/lib/plugins/signon-plugins-common/signon-plugins-common.pro b/lib/plugins/signon-plugins-common/signon-plugins-common.pro
+index 970bddc..e0d32cd 100644
+--- a/lib/plugins/signon-plugins-common/signon-plugins-common.pro
++++ b/lib/plugins/signon-plugins-common/signon-plugins-common.pro
+@@ -6,6 +6,7 @@ include($${TOP_SRC_DIR}/common-installs-config.pri)
+ include($${TOP_SRC_DIR}/common-vars.pri)
+ 
+ CONFIG += qt
++QT += dbus
+ 
+ INCLUDEPATH += ../
+ 
+diff --git a/tests/pluginproxytest/testpluginproxy.cpp b/tests/pluginproxytest/testpluginproxy.cpp
+index 2a5c567..5d7e55a 100644
+--- a/tests/pluginproxytest/testpluginproxy.cpp
++++ b/tests/pluginproxytest/testpluginproxy.cpp
+@@ -84,8 +84,16 @@ void TestPluginProxy::mechanisms_for_dummy()
+ 
+ void TestPluginProxy::process_for_dummy()
+ {
+-    SessionData inData;
+-
++    // Build up the session data.  It will include a value
++    // which is itself a QVariantMap in order to test the
++    // dbus argument expansion during marshalling.
++    QVariantMap providedTokens;
++    providedTokens.insert("AccessToken", "12345");
++    providedTokens.insert("RefreshToken", "abcde");
++    QVariantMap complexInData;
++    complexInData.insert("ProvidedTokens", providedTokens);
++
++    SessionData inData(complexInData);
+     inData.setRealm("testRealm");
+     inData.setUserName("testUsername");
+ 
+@@ -124,6 +132,8 @@ void TestPluginProxy::process_for_dummy()
+             outData["UserName"] == "testUsername");
+     QVERIFY(outData.contains("Realm") &&
+             outData["Realm"] == "testRealm_after_test");
++    QVERIFY(outData.contains("ProvidedTokens") &&
++            outData["ProvidedTokens"] == providedTokens);
+ }
+ 
+ void TestPluginProxy::processUi_for_dummy()
+-- 
+1.7.9.5
+
