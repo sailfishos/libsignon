@@ -40,7 +40,8 @@ static QPointer<ConnectionManager> connectionInstance = 0;
 ConnectionManager::ConnectionManager(QObject *parent):
     QObject(parent),
     m_connection(QLatin1String("libsignon-qt-invalid")),
-    m_serviceStatus(ServiceStatusUnknown)
+    m_serviceStatus(ServiceStatusUnknown),
+    m_retryCount(0)
 {
     if (connectionInstance == 0) {
         init();
@@ -128,6 +129,21 @@ void ConnectionManager::init()
 
     SocketConnectionStatus status = setupSocketConnection();
 
+    if (status == SocketConnectionUnavailable) {
+#ifdef ENABLE_P2P
+        if (m_retryCount >= 15) {
+            BLAME() << "Unable to activate p2p signond service!";
+            return;
+        }
+        TRACE() << "Unable to activate p2p signond service, trying again";
+        status = SocketConnectionNoService;
+        m_retryCount += 1;
+#else
+        TRACE() << "Unable to activate p2p signond service, falling back to session bus";
+        m_connection = SIGNOND_BUS;
+#endif
+    }
+
     if (status == SocketConnectionNoService) {
         TRACE() << "Peer connection unavailable, activating service";
         QDBusConnectionInterface *interface =
@@ -142,11 +158,10 @@ void ConnectionManager::init()
                          SIGNAL(finished(QDBusPendingCallWatcher*)),
                          this,
                          SLOT(onActivationDone(QDBusPendingCallWatcher*)));
-    } else if (status == SocketConnectionUnavailable) {
-        m_connection = SIGNOND_BUS;
     }
 
     if (m_connection.isConnected()) {
+        m_retryCount = 0;
         TRACE() << "Connected to" << m_connection.name();
         Q_EMIT connected(m_connection);
     }

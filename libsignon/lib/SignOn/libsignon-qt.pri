@@ -57,6 +57,10 @@ DEFINES += \
     QT_NO_CAST_FROM_ASCII \
     LIBSIGNON_TRACE
 
+CONFIG(enable-p2p) {
+    DEFINES += ENABLE_P2P
+}
+
 include( $$TOP_SRC_DIR/common-installs-config.pri )
 
 headers.files = $$public_headers \
