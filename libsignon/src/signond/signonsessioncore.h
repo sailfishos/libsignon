@@ -126,6 +126,7 @@ private:
 private:
     PluginProxy *m_plugin;
     QQueue<RequestData> m_listOfRequests;
+    QDBusConnection m_p2pc;
     SignonUiAdaptor *m_signonui;
 
     QDBusPendingCallWatcher *m_watcher;
