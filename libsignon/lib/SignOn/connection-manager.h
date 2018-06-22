@@ -74,6 +74,7 @@ private Q_SLOTS:
 private:
     QDBusConnection m_connection;
     ServiceStatus m_serviceStatus;
+    int m_retryCount;
 };
 
 }

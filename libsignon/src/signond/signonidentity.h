@@ -95,6 +95,7 @@ private:
 
 private:
     quint32 m_id;
+    QDBusConnection m_p2pc;
     SignonUiAdaptor *m_signonui;
     SignonIdentityInfo *m_pInfo;
 }; //class SignonDaemon

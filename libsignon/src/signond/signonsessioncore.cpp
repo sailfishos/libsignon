@@ -33,6 +33,10 @@
 #include "SignOn/authpluginif.h"
 #include "SignOn/signonerror.h"
 
+#ifdef ENABLE_P2P
+#include <QStandardPaths>
+#endif
+
 #define MAX_IDLE_TIME SIGNOND_MAX_IDLE_TIME
 /*
  * the watchdog searches for idle sessions with period of half of idle timeout
@@ -76,6 +80,7 @@ SignonSessionCore::SignonSessionCore(quint32 id,
                                      int timeout,
                                      QObject *parent):
     SignonDisposable(timeout, parent),
+    m_p2pc(QStringLiteral("session.dbus.connection")),
     m_signonui(0),
     m_watcher(0),
     m_requestIsActive(false),
@@ -84,10 +89,26 @@ SignonSessionCore::SignonSessionCore(quint32 id,
     m_method(method),
     m_queryCredsUiDisplayed(false)
 {
+#ifdef ENABLE_P2P
+    m_p2pc = QDBusConnection::connectToPeer(
+            QStringLiteral("unix:path=%1/signonui-socket")
+                      .arg(QStandardPaths::writableLocation(
+                                QStandardPaths::RuntimeLocation)),
+            QStringLiteral("signon-session-core-%1").arg(id));
+    if (!m_p2pc.isConnected()) {
+        BLAME() << "Session unable to connect to signonui socket:"
+                << m_p2pc.lastError()
+                << m_p2pc.lastError().type()
+                << m_p2pc.lastError().name();
+    }
+    m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
+                                     SIGNON_UI_DAEMON_OBJECTPATH,
+                                     m_p2pc);
+#else
     m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
                                      SIGNON_UI_DAEMON_OBJECTPATH,
                                      QDBusConnection::sessionBus());
-
+#endif
 
     connect(CredentialsAccessManager::instance(),
             SIGNAL(credentialsSystemReady()),
@@ -326,12 +347,23 @@ void SignonSessionCore::setId(quint32 id)
 
 void SignonSessionCore::startProcess()
 {
-
     TRACE() << "the number of requests is" << m_listOfRequests.length();
 
     m_requestIsActive = true;
     RequestData data = m_listOfRequests.head();
     QVariantMap parameters = data.m_params;
+
+#ifdef ENABLE_P2P
+    /* inject the in-process signon ui bus address */
+    pid_t clientPid = AccessControlManagerHelper::pidOfPeer(
+            data.m_conn, data.m_msg);
+    parameters.insert(
+            QStringLiteral("InProcessBusAddress"),
+            QStringLiteral("unix:path=%1/signonui-%2-socket")
+                      .arg(QStandardPaths::writableLocation(
+                                QStandardPaths::RuntimeLocation))
+                      .arg(clientPid));
+#endif
 
     /* save the client data; this should not be modified during the processing
      * of this request */

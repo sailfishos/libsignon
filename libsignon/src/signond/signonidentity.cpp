@@ -26,6 +26,9 @@
 
 #include <iostream>
 #include <QVariantMap>
+#ifdef ENABLE_P2P
+#include <QStandardPaths>
+#endif
 
 #include "signond-common.h"
 #include "signonidentity.h"
@@ -85,10 +88,11 @@ private:
 SignonIdentity::SignonIdentity(quint32 id, int timeout,
                                SignonDaemon *parent):
     SignonDisposable(timeout, parent),
+    m_id(id),
+    m_p2pc(QStringLiteral("identity.dbus.connection")),
+    m_signonui(NULL),
     m_pInfo(NULL)
 {
-    m_id = id;
-
     (void)new SignonIdentityAdaptor(this);
 
     /*
@@ -99,10 +103,28 @@ SignonIdentity::SignonIdentity(quint32 id, int timeout,
                          + QString::number(incr++, 16);
     setObjectName(objectName);
 
+#ifdef ENABLE_P2P
+    m_p2pc = QDBusConnection::connectToPeer(
+            QStringLiteral("unix:path=%1/signonui-socket")
+                      .arg(QStandardPaths::writableLocation(
+                                QStandardPaths::RuntimeLocation)),
+            objectName);
+    if (!m_p2pc.isConnected()) {
+        BLAME() << "Identity unable to connect to signonui socket:"
+                << m_p2pc.lastError()
+                << m_p2pc.lastError().type()
+                << m_p2pc.lastError().name();
+    }
+    m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
+                                     SIGNON_UI_DAEMON_OBJECTPATH,
+                                     m_p2pc,
+                                     this);
+#else
     m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
                                      SIGNON_UI_DAEMON_OBJECTPATH,
                                      QDBusConnection::sessionBus(),
                                      this);
+#endif
 
     /* Watch for credential updates happening outside of this object (this can
      * happen on request of authentication plugins) */
