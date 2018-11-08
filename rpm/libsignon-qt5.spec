@@ -38,6 +38,7 @@ Obsoletes: signon
 %config %{_sysconfdir}/signond.conf
 %{_libdir}/signon/libpasswordplugin.so
 %{_oneshotdir}/signon-storage-perm
+%attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
 
 %package -n libsignon-qt5
 Summary: Single Sign On Qt library

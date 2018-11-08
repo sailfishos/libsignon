@@ -1,7 +1,7 @@
 include( common-vars.pri )
 
 TEMPLATE  = subdirs
-SUBDIRS   = lib src server tests
+SUBDIRS   = lib src server tests libexec
 src.depends = lib
 tests.depends = lib src
 

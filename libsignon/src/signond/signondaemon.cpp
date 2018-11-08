@@ -372,6 +372,17 @@ SignonDaemon *SignonDaemon::instance()
         qFatal("SignonDaemon requires a QCoreApplication instance to be "
                "constructed first");
 
+    // Initialize storage
+    QString path = QString::fromLocal8Bit(signonDefaultStoragePath);
+    if (path.startsWith(QLatin1Char('~'))) {
+        path = path.replace(0, 1, QDir::homePath());
+    }
+    QDir dir;
+    dir.mkpath(path);
+    if (QProcess::execute(QLatin1String("/usr/libexec/signon-storage-perm"))) {
+        TRACE() << "Storage init failed";
+    }
+
     TRACE() << "Creating new daemon instance.";
     m_instance = new SignonDaemon(app);
     return m_instance;
