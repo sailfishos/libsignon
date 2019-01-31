@@ -50,7 +50,7 @@ Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
 
 %description -n libsignon-qt5
-%{summary}
+%{summary}.
 
 %files -n libsignon-qt5
 %defattr(-,root,root,-)
@@ -66,7 +66,7 @@ Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-testplugin
 
 %description testplugin
-%{summary}
+%{summary}.
 
 %files testplugin
 %defattr(-,root,root,-)
@@ -79,7 +79,7 @@ Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-exampleplugin
 
 %description exampleplugin
-%{summary}
+%{summary}.
 
 %files exampleplugin
 %defattr(-,root,root,-)
@@ -93,7 +93,7 @@ Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-devel
 
 %description devel
-%{summary}
+%{summary}.
 
 %files devel
 %defattr(-,root,root,-)
@@ -117,7 +117,7 @@ Group: Development/Libraries
 Requires: libsignon-qt5 = %{version}-%{release}
 
 %description -n libsignon-qt5-devel
-%{summary}
+%{summary}.
 
 %files -n libsignon-qt5-devel
 %defattr(-,root,root,-)
