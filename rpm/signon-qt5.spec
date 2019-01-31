@@ -6,6 +6,7 @@ Group: System/Libraries
 License: LGPLv2.1
 URL: https://gitlab.com/accounts-sso/signond
 Source0: %{name}-%{version}.tar.bz2
+Source1: %{name}.privileges
 BuildRequires: doxygen
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5DBus)
@@ -35,7 +36,10 @@ Obsoletes: signon
 %{_libdir}/libsignon-plugins-common.so.*
 %{_libdir}/libsignon-plugins.so.*
 %{_datadir}/dbus-1/services/*
+%{_datadir}/mapplauncherd/privileges.d/*
 %config %{_sysconfdir}/signond.conf
+# Own to signon library directory
+%dir %{_libdir}/signon
 %{_libdir}/signon/libpasswordplugin.so
 %{_oneshotdir}/signon-storage-perm
 %attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
@@ -46,7 +50,7 @@ Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
 
 %description -n libsignon-qt5
-%{summary}
+%{summary}.
 
 %files -n libsignon-qt5
 %defattr(-,root,root,-)
@@ -62,12 +66,11 @@ Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-testplugin
 
 %description testplugin
-%{summary}
+%{summary}.
 
 %files testplugin
 %defattr(-,root,root,-)
 %{_libdir}/signon/libssotest*.so
-
 
 %package exampleplugin
 Summary: Single Sign On example client
@@ -76,7 +79,7 @@ Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-exampleplugin
 
 %description exampleplugin
-%{summary}
+%{summary}.
 
 %files exampleplugin
 %defattr(-,root,root,-)
@@ -90,13 +93,13 @@ Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-devel
 
 %description devel
-%{summary}
+%{summary}.
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/signond/*
-%{_includedir}/signon-extension/*
-%{_includedir}/signon-plugins/*
+%{_includedir}/signond
+%{_includedir}/signon-extension
+%{_includedir}/signon-plugins
 %{_libdir}/libsignon-extension.so
 %{_libdir}/libsignon-plugins-common.so
 %{_libdir}/libsignon-plugins.so
@@ -104,8 +107,7 @@ Obsoletes: signon-devel
 %{_libdir}/pkgconfig/signon-plugins.pc
 %{_libdir}/pkgconfig/signon-plugins-common.pc
 %{_libdir}/pkgconfig/SignOnExtension.pc
-%{_libdir}/cmake/SignOnQt5/SignOnQt5Config.cmake
-%{_libdir}/cmake/SignOnQt5/SignOnQt5ConfigVersion.cmake
+%{_libdir}/cmake/SignOnQt5
 %{_datadir}/dbus-1/interfaces/*
 
 
@@ -115,11 +117,11 @@ Group: Development/Libraries
 Requires: libsignon-qt5 = %{version}-%{release}
 
 %description -n libsignon-qt5-devel
-%{summary}
+%{summary}.
 
 %files -n libsignon-qt5-devel
 %defattr(-,root,root,-)
-%{_includedir}/signon-qt5/*
+%{_includedir}/signon-qt5
 %{_libdir}/libsignon-qt5.so
 %exclude %{_libdir}/libsignon-qt5.a
 %{_libdir}/pkgconfig/libsignon-qt5.pc
@@ -135,9 +137,9 @@ Doxygen-generated HTML documentation for the signon.
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/signon/*
-%{_docdir}/signon-plugins-dev/*
-%{_docdir}/signon-plugins/*
+%{_docdir}/signon
+%{_docdir}/signon-plugins-dev
+%{_docdir}/signon-plugins
 
 
 %package -n libsignon-qt5-doc
@@ -149,7 +151,7 @@ Doxygen-generated HTML documentation for the signon-qt
 
 %files -n libsignon-qt5-doc
 %defattr(-,root,root,-)
-%{_docdir}/libsignon-qt5/*
+%{_docdir}/libsignon-qt5
 
 
 %package tests
@@ -187,6 +189,9 @@ rm -f %{buildroot}/%{_docdir}/saslplugin/html/installdox
 
 mkdir -p %{buildroot}/%{_oneshotdir}
 install -D -m 755 oneshot/signon-storage-perm %{buildroot}/%{_oneshotdir}
+
+mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 
 %post
 /sbin/ldconfig
