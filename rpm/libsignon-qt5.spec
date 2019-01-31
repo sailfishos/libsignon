@@ -6,6 +6,7 @@ Group: System/Libraries
 License: LGPLv2.1
 URL: https://gitlab.com/accounts-sso/signond
 Source0: %{name}-%{version}.tar.bz2
+Source1: %{name}.privileges
 BuildRequires: doxygen
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5DBus)
@@ -35,6 +36,7 @@ Obsoletes: signon
 %{_libdir}/libsignon-plugins-common.so.*
 %{_libdir}/libsignon-plugins.so.*
 %{_datadir}/dbus-1/services/*
+%{_datadir}/mapplauncherd/privileges.d/*
 %config %{_sysconfdir}/signond.conf
 %{_libdir}/signon/libpasswordplugin.so
 %{_oneshotdir}/signon-storage-perm
@@ -187,6 +189,9 @@ rm -f %{buildroot}/%{_docdir}/saslplugin/html/installdox
 
 mkdir -p %{buildroot}/%{_oneshotdir}
 install -D -m 755 oneshot/signon-storage-perm %{buildroot}/%{_oneshotdir}
+
+mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 
 %post
 /sbin/ldconfig
