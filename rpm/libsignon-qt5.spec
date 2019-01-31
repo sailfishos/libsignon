@@ -38,6 +38,8 @@ Obsoletes: signon
 %{_datadir}/dbus-1/services/*
 %{_datadir}/mapplauncherd/privileges.d/*
 %config %{_sysconfdir}/signond.conf
+# Own to signon library directory
+%dir %{_libdir}/signon
 %{_libdir}/signon/libpasswordplugin.so
 %{_oneshotdir}/signon-storage-perm
 %attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
@@ -70,7 +72,6 @@ Obsoletes: signon-testplugin
 %defattr(-,root,root,-)
 %{_libdir}/signon/libssotest*.so
 
-
 %package exampleplugin
 Summary: Single Sign On example client
 Group: System/Libraries
@@ -96,9 +97,9 @@ Obsoletes: signon-devel
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/signond/*
-%{_includedir}/signon-extension/*
-%{_includedir}/signon-plugins/*
+%{_includedir}/signond
+%{_includedir}/signon-extension
+%{_includedir}/signon-plugins
 %{_libdir}/libsignon-extension.so
 %{_libdir}/libsignon-plugins-common.so
 %{_libdir}/libsignon-plugins.so
@@ -106,8 +107,7 @@ Obsoletes: signon-devel
 %{_libdir}/pkgconfig/signon-plugins.pc
 %{_libdir}/pkgconfig/signon-plugins-common.pc
 %{_libdir}/pkgconfig/SignOnExtension.pc
-%{_libdir}/cmake/SignOnQt5/SignOnQt5Config.cmake
-%{_libdir}/cmake/SignOnQt5/SignOnQt5ConfigVersion.cmake
+%{_libdir}/cmake/SignOnQt5
 %{_datadir}/dbus-1/interfaces/*
 
 
@@ -121,7 +121,7 @@ Requires: libsignon-qt5 = %{version}-%{release}
 
 %files -n libsignon-qt5-devel
 %defattr(-,root,root,-)
-%{_includedir}/signon-qt5/*
+%{_includedir}/signon-qt5
 %{_libdir}/libsignon-qt5.so
 %exclude %{_libdir}/libsignon-qt5.a
 %{_libdir}/pkgconfig/libsignon-qt5.pc
@@ -137,9 +137,9 @@ Doxygen-generated HTML documentation for the signon.
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/signon/*
-%{_docdir}/signon-plugins-dev/*
-%{_docdir}/signon-plugins/*
+%{_docdir}/signon
+%{_docdir}/signon-plugins-dev
+%{_docdir}/signon-plugins
 
 
 %package -n libsignon-qt5-doc
@@ -151,7 +151,7 @@ Doxygen-generated HTML documentation for the signon-qt
 
 %files -n libsignon-qt5-doc
 %defattr(-,root,root,-)
-%{_docdir}/libsignon-qt5/*
+%{_docdir}/libsignon-qt5
 
 
 %package tests
