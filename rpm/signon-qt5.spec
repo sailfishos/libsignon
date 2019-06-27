@@ -20,10 +20,7 @@ BuildRequires: pkgconfig(accounts-qt5)
 BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: fdupes
-BuildRequires: oneshot
 Requires: mapplauncherd-qt5
-Requires: oneshot
-%{_oneshot_requires_post}
 Obsoletes: signon
 
 %description
@@ -41,7 +38,6 @@ Obsoletes: signon
 # Own to signon library directory
 %dir %{_libdir}/signon
 %{_libdir}/signon/libpasswordplugin.so
-%{_oneshotdir}/signon-storage-perm
 %attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
 
 %package -n libsignon-qt5
@@ -187,14 +183,10 @@ rm -f %{buildroot}/%{_docdir}/signon-plugins/html/installdox
 rm -f %{buildroot}/%{_docdir}/saslplugin/html/installdox
 %fdupes %{buildroot}/%{_docdir}
 
-mkdir -p %{buildroot}/%{_oneshotdir}
-install -D -m 755 oneshot/signon-storage-perm %{buildroot}/%{_oneshotdir}
-
 mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 
 %post
 /sbin/ldconfig
-%{_bindir}/add-oneshot signon-storage-perm
 
 %postun -p /sbin/ldconfig
