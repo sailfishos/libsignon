@@ -1,26 +1,22 @@
-From dd35fbae93dd6804f79b6c729f98d977e9cb27dd Mon Sep 17 00:00:00 2001
+From 9cb171bb9816690c830c9c5a24f1cf6882256cb3 Mon Sep 17 00:00:00 2001
 From: Robin Burchell <robin+git@viroteck.net>
 Date: Thu, 11 Jul 2013 08:53:06 +0000
-Subject: [PATCH 02/11] fix documentation path
+Subject: [PATCH 2/8] fix documentation path
 
 ---
- lib/SignOn/doc/doc.pri | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ lib/SignOn/doc/doc.pri | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/SignOn/doc/doc.pri b/lib/SignOn/doc/doc.pri
-index 46f1148..5c5da07 100644
+index 46f1148..3f2a96b 100644
 --- a/lib/SignOn/doc/doc.pri
 +++ b/lib/SignOn/doc/doc.pri
-@@ -58,7 +58,11 @@ include( ../../../common-installs-config.pri )
+@@ -58,7 +58,7 @@ include( ../../../common-installs-config.pri )
  #-----------------------------------------------------------------------------
  # Installation target setup for documentation
  #-----------------------------------------------------------------------------
 -documentation.path = $${INSTALL_PREFIX}/share/doc/libsignon-qt
-+greaterThan(QT_MAJOR_VERSION, 4) {
-+    documentation.path = $${INSTALL_PREFIX}/share/doc/libsignon-qt5
-+} else {
-+    documentation.path = $${INSTALL_PREFIX}/share/doc/libsignon-qt
-+}
++documentation.path = $${INSTALL_PREFIX}/share/doc/libsignon-qt5
  for( folder, DOC_FOLDERS ) {
      documentation.files += $${folder}
  }

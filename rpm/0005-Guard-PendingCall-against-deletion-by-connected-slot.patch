@@ -1,7 +1,7 @@
-From 4abd7f0054927491fa8774f8b1dc17377275a693 Mon Sep 17 00:00:00 2001
+From 3d1d5c703763c949a189603fac2095bff312c9f2 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Fri, 6 Feb 2015 15:39:16 +1000
-Subject: [PATCH 07/11] Guard PendingCall against deletion by connected slots
+Subject: [PATCH 5/8] Guard PendingCall against deletion by connected slots
 
 This commit uses QPointer to guard the PendingCall object (and the
 QDBusPendingCallWatcher associated with it).
@@ -14,10 +14,10 @@ side-effect) is found and corrected.
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/lib/SignOn/async-dbus-proxy.cpp b/lib/SignOn/async-dbus-proxy.cpp
-index ecd8284..2087c6e 100644
+index 8656e48..94db648 100644
 --- a/lib/SignOn/async-dbus-proxy.cpp
 +++ b/lib/SignOn/async-dbus-proxy.cpp
-@@ -30,6 +30,7 @@
+@@ -29,6 +29,7 @@
  #include <QDebug>
  #include <QMetaMethod>
  #include <QMetaType>
