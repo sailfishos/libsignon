@@ -1,6 +1,6 @@
 Name: signon-qt5
-Version: 8.57
-Release: 5
+Version: 8.59
+Release: 1
 Summary: Single Sign On framework
 Group: System/Libraries
 License: LGPLv2.1
@@ -11,14 +11,11 @@ Source1: %{name}.privileges
 Patch1:  0001-disable-multilib.patch
 Patch2:  0002-fix-documentation-path.patch
 Patch3:  0003-Install-tests-add-tests-definition.patch
-Patch4:  0004-Continue-reading-from-plugins-after-handling-respons.patch
-Patch5:  0005-Set-permissions-on-config-dir-correctly.patch
-Patch6:  0006-Initialize-private-member-ptr-in-ctor-to-avoid-crash.patch
-Patch7:  0007-Guard-PendingCall-against-deletion-by-connected-slot.patch
-Patch8:  0008-Add-missing-include.-Contributes-to-JB-35409.patch
-Patch9:  0009-Always-use-P2P-DBus-if-enabled.-Contributes-to-JB-42.patch
-Patch10: 0010-Use-p2p-dbus-for-signon-ui-flows.-Contributes-to-JB-.patch
-Patch11: 0011-Initialize-secrets-db-on-start.-Fixes-JB-34557.patch
+Patch4:  0004-Set-permissions-on-config-dir-correctly.patch
+Patch5:  0005-Guard-PendingCall-against-deletion-by-connected-slot.patch
+Patch6:  0006-Always-use-P2P-DBus-if-enabled.-Contributes-to-JB-42.patch
+Patch7:  0007-Use-p2p-dbus-for-signon-ui-flows.-Contributes-to-JB-.patch
+Patch8:  0008-Initialize-secrets-db-on-start.-Fixes-JB-34557.patch
 
 BuildRequires: doxygen
 BuildRequires: pkgconfig(Qt5Core)
@@ -189,9 +186,6 @@ This package contains tests for signon
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
 
 chmod +x tests/create-tests-definition.sh
 

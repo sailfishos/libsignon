@@ -1,8 +1,7 @@
-From e050537b11ebc710f68a3842300838a301573aef Mon Sep 17 00:00:00 2001
+From 7d41b3af7c9dfedb8ce88670a725735147be2e96 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
-Subject: [PATCH 10/11] Use p2p dbus for signon-ui flows. Contributes to
- JB#42126
+Subject: [PATCH 7/8] Use p2p dbus for signon-ui flows. Contributes to JB#42126
 
 ---
  src/signond/signonidentity.cpp    | 26 ++++++++++++++++++++--
@@ -12,10 +11,10 @@ Subject: [PATCH 10/11] Use p2p dbus for signon-ui flows. Contributes to
  4 files changed, 60 insertions(+), 4 deletions(-)
 
 diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
-index 074273f..ff4d2a7 100644
+index ce1ecfb..259b70a 100644
 --- a/src/signond/signonidentity.cpp
 +++ b/src/signond/signonidentity.cpp
-@@ -26,6 +26,9 @@
+@@ -25,6 +25,9 @@
  
  #include <iostream>
  #include <QVariantMap>
@@ -25,7 +24,7 @@ index 074273f..ff4d2a7 100644
  
  #include "signond-common.h"
  #include "signonidentity.h"
-@@ -85,10 +88,11 @@ private:
+@@ -84,10 +87,11 @@ private:
  SignonIdentity::SignonIdentity(quint32 id, int timeout,
                                 SignonDaemon *parent):
      SignonDisposable(timeout, parent),
@@ -39,7 +38,7 @@ index 074273f..ff4d2a7 100644
      (void)new SignonIdentityAdaptor(this);
  
      /*
-@@ -99,10 +103,28 @@ SignonIdentity::SignonIdentity(quint32 id, int timeout,
+@@ -98,10 +102,28 @@ SignonIdentity::SignonIdentity(quint32 id, int timeout,
                           + QString::number(incr++, 16);
      setObjectName(objectName);
  
@@ -69,10 +68,10 @@ index 074273f..ff4d2a7 100644
      /* Watch for credential updates happening outside of this object (this can
       * happen on request of authentication plugins) */
 diff --git a/src/signond/signonidentity.h b/src/signond/signonidentity.h
-index c87367e..a596b53 100644
+index 9ec9be4..ba28a07 100644
 --- a/src/signond/signonidentity.h
 +++ b/src/signond/signonidentity.h
-@@ -95,6 +95,7 @@ private:
+@@ -94,6 +94,7 @@ private:
  
  private:
      quint32 m_id;
@@ -81,10 +80,10 @@ index c87367e..a596b53 100644
      SignonIdentityInfo *m_pInfo;
  }; //class SignonDaemon
 diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
-index efded7c..bc392c2 100644
+index b0510db..dca7880 100644
 --- a/src/signond/signonsessioncore.cpp
 +++ b/src/signond/signonsessioncore.cpp
-@@ -33,6 +33,10 @@
+@@ -34,6 +34,10 @@
  #include "SignOn/authpluginif.h"
  #include "SignOn/signonerror.h"
  
@@ -95,7 +94,7 @@ index efded7c..bc392c2 100644
  #define MAX_IDLE_TIME SIGNOND_MAX_IDLE_TIME
  /*
   * the watchdog searches for idle sessions with period of half of idle timeout
-@@ -76,6 +80,7 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+@@ -77,6 +81,7 @@ SignonSessionCore::SignonSessionCore(quint32 id,
                                       int timeout,
                                       QObject *parent):
      SignonDisposable(timeout, parent),
@@ -103,7 +102,7 @@ index efded7c..bc392c2 100644
      m_signonui(0),
      m_watcher(0),
      m_requestIsActive(false),
-@@ -84,10 +89,26 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+@@ -85,10 +90,26 @@ SignonSessionCore::SignonSessionCore(quint32 id,
      m_method(method),
      m_queryCredsUiDisplayed(false)
  {
@@ -131,7 +130,7 @@ index efded7c..bc392c2 100644
  
      connect(CredentialsAccessManager::instance(),
              SIGNAL(credentialsSystemReady()),
-@@ -326,13 +347,24 @@ void SignonSessionCore::setId(quint32 id)
+@@ -312,13 +333,24 @@ void SignonSessionCore::setId(quint32 id)
  
  void SignonSessionCore::startProcess()
  {
@@ -158,7 +157,7 @@ index efded7c..bc392c2 100644
       * of this request */
      m_clientData = parameters;
 diff --git a/src/signond/signonsessioncore.h b/src/signond/signonsessioncore.h
-index 4afc195..9e95a0e 100644
+index d4a428c..bb0543b 100644
 --- a/src/signond/signonsessioncore.h
 +++ b/src/signond/signonsessioncore.h
 @@ -126,6 +126,7 @@ private:

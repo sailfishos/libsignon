@@ -1,7 +1,7 @@
-From ca9eb403bd49bb13b487fcbd788c8052f35e53f9 Mon Sep 17 00:00:00 2001
+From 843bcff0cdcfe19216ad7b6790de84ba8eacbe8b Mon Sep 17 00:00:00 2001
 From: Martin Kampas <martin.kampas@tieto.com>
 Date: Mon, 18 Mar 2013 16:50:19 +0100
-Subject: [PATCH 03/11] Install tests, add tests definition
+Subject: [PATCH 3/8] Install tests, add tests definition
 
 Signed-off-by: Martin Kampas <martin.kampas@tieto.com>
 ---
