@@ -1,8 +1,7 @@
-From e050537b11ebc710f68a3842300838a301573aef Mon Sep 17 00:00:00 2001
+From 527600a48f7a07d3f3e20e53fcd0f395605fdb45 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
-Subject: [PATCH 10/11] Use p2p dbus for signon-ui flows. Contributes to
- JB#42126
+Subject: [PATCH 7/8] Use p2p dbus for signon-ui flows. Contributes to JB#42126
 
 ---
  src/signond/signonidentity.cpp    | 26 ++++++++++++++++++++--
@@ -12,7 +11,7 @@ Subject: [PATCH 10/11] Use p2p dbus for signon-ui flows. Contributes to
  4 files changed, 60 insertions(+), 4 deletions(-)
 
 diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
-index 074273f..ff4d2a7 100644
+index db0e759..226b2d3 100644
 --- a/src/signond/signonidentity.cpp
 +++ b/src/signond/signonidentity.cpp
 @@ -26,6 +26,9 @@
@@ -81,7 +80,7 @@ index c87367e..a596b53 100644
      SignonIdentityInfo *m_pInfo;
  }; //class SignonDaemon
 diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
-index efded7c..bc392c2 100644
+index be33a5b..326f5cb 100644
 --- a/src/signond/signonsessioncore.cpp
 +++ b/src/signond/signonsessioncore.cpp
 @@ -33,6 +33,10 @@

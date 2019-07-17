@@ -1,7 +1,7 @@
-From e405a1c3417725e1135f690f5da973593dcc2060 Mon Sep 17 00:00:00 2001
+From 3a317dcc64ca79000a8e5a59c1515c5ecf455e04 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Thu, 20 Mar 2014 21:44:25 +1000
-Subject: [PATCH 05/11] Set permissions on config dir correctly
+Subject: [PATCH 4/8] Set permissions on config dir correctly
 
 Also ensure that signond is launched with privileged permissions
 ---
