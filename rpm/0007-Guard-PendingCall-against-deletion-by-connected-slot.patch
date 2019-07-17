@@ -1,0 +1,48 @@
+From 4abd7f0054927491fa8774f8b1dc17377275a693 Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Fri, 6 Feb 2015 15:39:16 +1000
+Subject: [PATCH 07/11] Guard PendingCall against deletion by connected slots
+
+This commit uses QPointer to guard the PendingCall object (and the
+QDBusPendingCallWatcher associated with it).
+
+It should not be required, and this commit should be removed once
+the root cause (connected slot which delete's the PendingCall via
+side-effect) is found and corrected.
+---
+ lib/SignOn/async-dbus-proxy.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/lib/SignOn/async-dbus-proxy.cpp b/lib/SignOn/async-dbus-proxy.cpp
+index ecd8284..2087c6e 100644
+--- a/lib/SignOn/async-dbus-proxy.cpp
++++ b/lib/SignOn/async-dbus-proxy.cpp
+@@ -30,6 +30,7 @@
+ #include <QDebug>
+ #include <QMetaMethod>
+ #include <QMetaType>
++#include <QPointer>
+ 
+ #include "connection-manager.h"
+ #include "dbusinterface.h"
+@@ -117,12 +118,16 @@ void PendingCall::onFinished(QDBusPendingCallWatcher *watcher)
+         }
+     }
+ 
++    QPointer<PendingCall> thisguard(this);
++    QPointer<QDBusPendingCallWatcher> watcherguard(watcher);
+     if (watcher->isError()) {
+         Q_EMIT error(watcher->error());
+     } else {
+         Q_EMIT success(watcher);
+     }
+-    Q_EMIT finished(watcher);
++    if (thisguard) {
++        Q_EMIT finished(watcherguard ? watcher : 0);
++    }
+ }
+ 
+ void PendingCall::onInterfaceDestroyed()
+-- 
+2.20.1
+
