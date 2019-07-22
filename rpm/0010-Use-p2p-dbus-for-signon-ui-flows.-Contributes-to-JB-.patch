@@ -1,0 +1,174 @@
+From e050537b11ebc710f68a3842300838a301573aef Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Tue, 19 Jun 2018 13:15:36 +1000
+Subject: [PATCH 10/11] Use p2p dbus for signon-ui flows. Contributes to
+ JB#42126
+
+---
+ src/signond/signonidentity.cpp    | 26 ++++++++++++++++++++--
+ src/signond/signonidentity.h      |  1 +
+ src/signond/signonsessioncore.cpp | 36 +++++++++++++++++++++++++++++--
+ src/signond/signonsessioncore.h   |  1 +
+ 4 files changed, 60 insertions(+), 4 deletions(-)
+
+diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
+index 074273f..ff4d2a7 100644
+--- a/src/signond/signonidentity.cpp
++++ b/src/signond/signonidentity.cpp
+@@ -26,6 +26,9 @@
+ 
+ #include <iostream>
+ #include <QVariantMap>
++#ifdef ENABLE_P2P
++#include <QStandardPaths>
++#endif
+ 
+ #include "signond-common.h"
+ #include "signonidentity.h"
+@@ -85,10 +88,11 @@ private:
+ SignonIdentity::SignonIdentity(quint32 id, int timeout,
+                                SignonDaemon *parent):
+     SignonDisposable(timeout, parent),
++    m_id(id),
++    m_p2pc(QStringLiteral("identity.dbus.connection")),
++    m_signonui(NULL),
+     m_pInfo(NULL)
+ {
+-    m_id = id;
+-
+     (void)new SignonIdentityAdaptor(this);
+ 
+     /*
+@@ -99,10 +103,28 @@ SignonIdentity::SignonIdentity(quint32 id, int timeout,
+                          + QString::number(incr++, 16);
+     setObjectName(objectName);
+ 
++#ifdef ENABLE_P2P
++    m_p2pc = QDBusConnection::connectToPeer(
++            QStringLiteral("unix:path=%1/signonui-socket")
++                      .arg(QStandardPaths::writableLocation(
++                                QStandardPaths::RuntimeLocation)),
++            objectName);
++    if (!m_p2pc.isConnected()) {
++        BLAME() << "Identity unable to connect to signonui socket:"
++                << m_p2pc.lastError()
++                << m_p2pc.lastError().type()
++                << m_p2pc.lastError().name();
++    }
++    m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
++                                     SIGNON_UI_DAEMON_OBJECTPATH,
++                                     m_p2pc,
++                                     this);
++#else
+     m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
+                                      SIGNON_UI_DAEMON_OBJECTPATH,
+                                      QDBusConnection::sessionBus(),
+                                      this);
++#endif
+ 
+     /* Watch for credential updates happening outside of this object (this can
+      * happen on request of authentication plugins) */
+diff --git a/src/signond/signonidentity.h b/src/signond/signonidentity.h
+index c87367e..a596b53 100644
+--- a/src/signond/signonidentity.h
++++ b/src/signond/signonidentity.h
+@@ -95,6 +95,7 @@ private:
+ 
+ private:
+     quint32 m_id;
++    QDBusConnection m_p2pc;
+     SignonUiAdaptor *m_signonui;
+     SignonIdentityInfo *m_pInfo;
+ }; //class SignonDaemon
+diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
+index efded7c..bc392c2 100644
+--- a/src/signond/signonsessioncore.cpp
++++ b/src/signond/signonsessioncore.cpp
+@@ -33,6 +33,10 @@
+ #include "SignOn/authpluginif.h"
+ #include "SignOn/signonerror.h"
+ 
++#ifdef ENABLE_P2P
++#include <QStandardPaths>
++#endif
++
+ #define MAX_IDLE_TIME SIGNOND_MAX_IDLE_TIME
+ /*
+  * the watchdog searches for idle sessions with period of half of idle timeout
+@@ -76,6 +80,7 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+                                      int timeout,
+                                      QObject *parent):
+     SignonDisposable(timeout, parent),
++    m_p2pc(QStringLiteral("session.dbus.connection")),
+     m_signonui(0),
+     m_watcher(0),
+     m_requestIsActive(false),
+@@ -84,10 +89,26 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+     m_method(method),
+     m_queryCredsUiDisplayed(false)
+ {
++#ifdef ENABLE_P2P
++    m_p2pc = QDBusConnection::connectToPeer(
++            QStringLiteral("unix:path=%1/signonui-socket")
++                      .arg(QStandardPaths::writableLocation(
++                                QStandardPaths::RuntimeLocation)),
++            QStringLiteral("signon-session-core-%1").arg(id));
++    if (!m_p2pc.isConnected()) {
++        BLAME() << "Session unable to connect to signonui socket:"
++                << m_p2pc.lastError()
++                << m_p2pc.lastError().type()
++                << m_p2pc.lastError().name();
++    }
++    m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
++                                     SIGNON_UI_DAEMON_OBJECTPATH,
++                                     m_p2pc);
++#else
+     m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
+                                      SIGNON_UI_DAEMON_OBJECTPATH,
+                                      QDBusConnection::sessionBus());
+-
++#endif
+ 
+     connect(CredentialsAccessManager::instance(),
+             SIGNAL(credentialsSystemReady()),
+@@ -326,13 +347,24 @@ void SignonSessionCore::setId(quint32 id)
+ 
+ void SignonSessionCore::startProcess()
+ {
+-
+     TRACE() << "the number of requests is" << m_listOfRequests.length();
+ 
+     m_requestIsActive = true;
+     RequestData data = m_listOfRequests.head();
+     QVariantMap parameters = data.m_params;
+ 
++#ifdef ENABLE_P2P
++    /* inject the in-process signon ui bus address */
++    pid_t clientPid = AccessControlManagerHelper::pidOfPeer(
++            data.m_conn, data.m_msg);
++    parameters.insert(
++            QStringLiteral("InProcessBusAddress"),
++            QStringLiteral("unix:path=%1/signonui-%2-socket")
++                      .arg(QStandardPaths::writableLocation(
++                                QStandardPaths::RuntimeLocation))
++                      .arg(clientPid));
++#endif
++
+     /* save the client data; this should not be modified during the processing
+      * of this request */
+     m_clientData = parameters;
+diff --git a/src/signond/signonsessioncore.h b/src/signond/signonsessioncore.h
+index 4afc195..9e95a0e 100644
+--- a/src/signond/signonsessioncore.h
++++ b/src/signond/signonsessioncore.h
+@@ -126,6 +126,7 @@ private:
+ private:
+     PluginProxy *m_plugin;
+     QQueue<RequestData> m_listOfRequests;
++    QDBusConnection m_p2pc;
+     SignonUiAdaptor *m_signonui;
+ 
+     QDBusPendingCallWatcher *m_watcher;
+-- 
+2.20.1
+

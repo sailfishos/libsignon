@@ -1,0 +1,93 @@
+From 9209482235538a1d605d04dfd5b721fe1917433c Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Tue, 19 Jun 2018 15:06:11 +1000
+Subject: [PATCH 09/11] Always use P2P DBus if enabled. Contributes to JB#42126
+
+This commit ensures that if the enable-p2p config is set, we don't
+ever allow falling back to the session bus to service signon requests,
+as that could result in leaking sensitive information.
+---
+ lib/SignOn/connection-manager.cpp | 21 ++++++++++++++++++---
+ lib/SignOn/connection-manager.h   |  1 +
+ lib/SignOn/libsignon-qt.pri       |  4 ++++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/lib/SignOn/connection-manager.cpp b/lib/SignOn/connection-manager.cpp
+index d08edb6..98ab434 100644
+--- a/lib/SignOn/connection-manager.cpp
++++ b/lib/SignOn/connection-manager.cpp
+@@ -40,7 +40,8 @@ static QPointer<ConnectionManager> connectionInstance = 0;
+ ConnectionManager::ConnectionManager(QObject *parent):
+     QObject(parent),
+     m_connection(QLatin1String("libsignon-qt-invalid")),
+-    m_serviceStatus(ServiceStatusUnknown)
++    m_serviceStatus(ServiceStatusUnknown),
++    m_retryCount(0)
+ {
+     if (connectionInstance == 0) {
+         init();
+@@ -128,6 +129,21 @@ void ConnectionManager::init()
+ 
+     SocketConnectionStatus status = setupSocketConnection();
+ 
++    if (status == SocketConnectionUnavailable) {
++#ifdef ENABLE_P2P
++        if (m_retryCount >= 15) {
++            BLAME() << "Unable to activate p2p signond service!";
++            return;
++        }
++        TRACE() << "Unable to activate p2p signond service, trying again";
++        status = SocketConnectionNoService;
++        m_retryCount += 1;
++#else
++        TRACE() << "Unable to activate p2p signond service, falling back to session bus";
++        m_connection = SIGNOND_BUS;
++#endif
++    }
++
+     if (status == SocketConnectionNoService) {
+         TRACE() << "Peer connection unavailable, activating service";
+         QDBusConnectionInterface *interface =
+@@ -142,11 +158,10 @@ void ConnectionManager::init()
+                          SIGNAL(finished(QDBusPendingCallWatcher*)),
+                          this,
+                          SLOT(onActivationDone(QDBusPendingCallWatcher*)));
+-    } else if (status == SocketConnectionUnavailable) {
+-        m_connection = SIGNOND_BUS;
+     }
+ 
+     if (m_connection.isConnected()) {
++        m_retryCount = 0;
+         TRACE() << "Connected to" << m_connection.name();
+         Q_EMIT connected(m_connection);
+     }
+diff --git a/lib/SignOn/connection-manager.h b/lib/SignOn/connection-manager.h
+index 4cf7de3..b0ce11b 100644
+--- a/lib/SignOn/connection-manager.h
++++ b/lib/SignOn/connection-manager.h
+@@ -74,6 +74,7 @@ private Q_SLOTS:
+ private:
+     QDBusConnection m_connection;
+     ServiceStatus m_serviceStatus;
++    int m_retryCount;
+ };
+ 
+ }
+diff --git a/lib/SignOn/libsignon-qt.pri b/lib/SignOn/libsignon-qt.pri
+index 0356509..1bcc0d4 100644
+--- a/lib/SignOn/libsignon-qt.pri
++++ b/lib/SignOn/libsignon-qt.pri
+@@ -57,6 +57,10 @@ DEFINES += \
+     QT_NO_CAST_FROM_ASCII \
+     LIBSIGNON_TRACE
+ 
++CONFIG(enable-p2p) {
++    DEFINES += ENABLE_P2P
++}
++
+ include( $$TOP_SRC_DIR/common-installs-config.pri )
+ 
+ headers.files = $$public_headers \
+-- 
+2.20.1
+
