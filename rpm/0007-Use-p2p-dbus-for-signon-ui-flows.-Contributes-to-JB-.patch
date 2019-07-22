@@ -1,4 +1,4 @@
-From 95055459e8ca7ffee44c93adb1dc840864ed3eb8 Mon Sep 17 00:00:00 2001
+From 2082fcd65a3021faf3a29de66b9c8ce3dd58b192 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
 Subject: [PATCH 7/9] Use p2p dbus for signon-ui flows. Contributes to JB#42126

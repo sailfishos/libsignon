@@ -1,4 +1,4 @@
-From 161430c5194413a3be5245f4cd2ef586abbf18f5 Mon Sep 17 00:00:00 2001
+From 00a7860b4c16c1f63f62dfba874ecf57ed407e13 Mon Sep 17 00:00:00 2001
 From: Robin Burchell <robin+git@viroteck.net>
 Date: Thu, 11 Jul 2013 08:53:06 +0000
 Subject: [PATCH 2/9] fix documentation path

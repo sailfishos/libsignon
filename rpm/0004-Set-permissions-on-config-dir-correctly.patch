@@ -1,4 +1,4 @@
-From d3f24755fbd48a09c1dd6c9902a6059d8a87a17c Mon Sep 17 00:00:00 2001
+From 4b94fac952a1cbd8fa7f2f068e220f09f948ae3d Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Thu, 20 Mar 2014 21:44:25 +1000
 Subject: [PATCH 4/9] Set permissions on config dir correctly
@@ -43,7 +43,7 @@ index 89192e7..841455b 100644
      QCoreApplication app(argc, argv);
      installSigHandlers();
 diff --git a/src/signond/signond.pro b/src/signond/signond.pro
-index 86588d5..00d2ead 100644
+index 60ee5e7..f7f83c9 100644
 --- a/src/signond/signond.pro
 +++ b/src/signond/signond.pro
 @@ -8,6 +8,13 @@ QT += core \
