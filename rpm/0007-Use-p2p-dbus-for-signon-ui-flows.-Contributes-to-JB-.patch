@@ -1,7 +1,7 @@
-From 7d41b3af7c9dfedb8ce88670a725735147be2e96 Mon Sep 17 00:00:00 2001
+From 95055459e8ca7ffee44c93adb1dc840864ed3eb8 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
-Subject: [PATCH 7/8] Use p2p dbus for signon-ui flows. Contributes to JB#42126
+Subject: [PATCH 7/9] Use p2p dbus for signon-ui flows. Contributes to JB#42126
 
 ---
  src/signond/signonidentity.cpp    | 26 ++++++++++++++++++++--
@@ -169,5 +169,5 @@ index d4a428c..bb0543b 100644
  
      QDBusPendingCallWatcher *m_watcher;
 -- 
-2.20.1
+2.17.1
 

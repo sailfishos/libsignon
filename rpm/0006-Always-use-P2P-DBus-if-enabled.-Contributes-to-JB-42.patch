@@ -1,7 +1,7 @@
-From 96f6867b69c30938b5e867ed09147ab209d38645 Mon Sep 17 00:00:00 2001
+From aee866158d7ed0ecd86334b5aa02e134d376680b Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 15:06:11 +1000
-Subject: [PATCH 6/8] Always use P2P DBus if enabled. Contributes to JB#42126
+Subject: [PATCH 6/9] Always use P2P DBus if enabled. Contributes to JB#42126
 
 This commit ensures that if the enable-p2p config is set, we don't
 ever allow falling back to the session bus to service signon requests,
@@ -89,5 +89,5 @@ index 5782d72..3eef484 100644
  
  headers.files = $$public_headers \
 -- 
-2.20.1
+2.17.1
 

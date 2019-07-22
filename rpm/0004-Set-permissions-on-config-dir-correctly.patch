@@ -1,7 +1,7 @@
-From a682fda4d2ccbc9d73d15e2e45f0c34dbd4e2816 Mon Sep 17 00:00:00 2001
+From d3f24755fbd48a09c1dd6c9902a6059d8a87a17c Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Thu, 20 Mar 2014 21:44:25 +1000
-Subject: [PATCH 4/8] Set permissions on config dir correctly
+Subject: [PATCH 4/9] Set permissions on config dir correctly
 
 Also ensure that signond is launched with privileged permissions
 ---
@@ -61,5 +61,5 @@ index 86588d5..00d2ead 100644
  DBUS_ADAPTORS += \
      ../../lib/signond/com.nokia.SingleSignOn.Backup.xml
 -- 
-2.20.1
+2.17.1
 
