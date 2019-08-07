@@ -1,10 +1,10 @@
-Name: signon-qt5
+Name:    signon-qt5
 Version: 8.57
 Release: 5
 Summary: Single Sign On framework
-Group: System/Libraries
-License: LGPLv2.1
-URL: https://gitlab.com/accounts-sso/signond
+Group:   System/Libraries
+License: LGPLv2
+URL:     https://gitlab.com/accounts-sso/signond
 Source0: %{name}-%{version}.tar.bz2
 Source1: %{name}.privileges
 
@@ -52,10 +52,10 @@ Obsoletes: signon
 %dir %{_libdir}/signon
 %{_libdir}/signon/libpasswordplugin.so
 %attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
+%license COPYING
 
 %package -n libsignon-qt5
 Summary: Single Sign On Qt library
-Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
 
 %description -n libsignon-qt5
@@ -70,7 +70,6 @@ Requires: %{name} = %{version}-%{release}
 
 %package testplugin
 Summary: Single Sign On test plugins
-Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-testplugin
 
@@ -83,7 +82,6 @@ Obsoletes: signon-testplugin
 
 %package exampleplugin
 Summary: Single Sign On example client
-Group: System/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-exampleplugin
 
