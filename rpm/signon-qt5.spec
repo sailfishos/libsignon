@@ -2,7 +2,6 @@ Name:    signon-qt5
 Version: 8.59
 Release: 1
 Summary: Single Sign On framework
-Group:   System/Libraries
 License: LGPLv2
 URL:     https://gitlab.com/accounts-sso/signond
 Source0: %{name}-%{version}.tar.bz2
@@ -43,7 +42,11 @@ Obsoletes: signon
 %{_libdir}/libsignon-extension.so.*
 %{_libdir}/libsignon-plugins-common.so.*
 %{_libdir}/libsignon-plugins.so.*
-%{_datadir}/dbus-1/services/*
+%{_datadir}/dbus-1/services/com.google.code.AccountsSSO.SingleSignOn.service
+%{_datadir}/dbus-1/services/com.nokia.SingleSignOn.Backup.service
+%{_datadir}/dbus-1/interfaces/com.google.code.AccountsSSO.SingleSignOn.AuthService.xml
+%{_datadir}/dbus-1/interfaces/com.google.code.AccountsSSO.SingleSignOn.AuthSession.xml
+%{_datadir}/dbus-1/interfaces/com.google.code.AccountsSSO.SingleSignOn.Identity.xml
 %{_datadir}/mapplauncherd/privileges.d/*
 %config %{_sysconfdir}/signond.conf
 # Own to signon library directory
@@ -93,7 +96,6 @@ Obsoletes: signon-exampleplugin
 
 %package devel
 Summary: Development files for signon
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-devel
 
@@ -118,7 +120,6 @@ Obsoletes: signon-devel
 
 %package -n libsignon-qt5-devel
 Summary: Development files for libsignon-qt
-Group: Development/Libraries
 Requires: libsignon-qt5 = %{version}-%{release}
 
 %description -n libsignon-qt5-devel
@@ -134,7 +135,6 @@ Requires: libsignon-qt5 = %{version}-%{release}
 
 %package doc
 Summary: Documentation for signon
-Group: Documentation
 Obsoletes: signon-doc
 
 %description doc
@@ -149,7 +149,6 @@ Doxygen-generated HTML documentation for the signon.
 
 %package -n libsignon-qt5-doc
 Summary: Documentation for signon-qt
-Group: Documentation
 
 %description -n libsignon-qt5-doc
 Doxygen-generated HTML documentation for the signon-qt
@@ -161,7 +160,6 @@ Doxygen-generated HTML documentation for the signon-qt
 
 %package tests
 Summary: Tests for signon
-Group: System/X11
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-testplugin = %{version}-%{release}
 Obsoletes: signon-tests
@@ -209,3 +207,4 @@ install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
+
