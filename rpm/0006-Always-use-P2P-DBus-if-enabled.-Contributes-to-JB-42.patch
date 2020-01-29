@@ -1,7 +1,7 @@
-From 9209482235538a1d605d04dfd5b721fe1917433c Mon Sep 17 00:00:00 2001
+From 79a4af5f18febbd448ffe66fb27b105d44172a77 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 15:06:11 +1000
-Subject: [PATCH 09/11] Always use P2P DBus if enabled. Contributes to JB#42126
+Subject: [PATCH 6/9] Always use P2P DBus if enabled. Contributes to JB#42126
 
 This commit ensures that if the enable-p2p config is set, we don't
 ever allow falling back to the session bus to service signon requests,
@@ -13,10 +13,10 @@ as that could result in leaking sensitive information.
  3 files changed, 23 insertions(+), 3 deletions(-)
 
 diff --git a/lib/SignOn/connection-manager.cpp b/lib/SignOn/connection-manager.cpp
-index d08edb6..98ab434 100644
+index 817390b..56c73af 100644
 --- a/lib/SignOn/connection-manager.cpp
 +++ b/lib/SignOn/connection-manager.cpp
-@@ -40,7 +40,8 @@ static QPointer<ConnectionManager> connectionInstance = 0;
+@@ -39,7 +39,8 @@ static QPointer<ConnectionManager> connectionInstance = 0;
  ConnectionManager::ConnectionManager(QObject *parent):
      QObject(parent),
      m_connection(QLatin1String("libsignon-qt-invalid")),
@@ -26,7 +26,7 @@ index d08edb6..98ab434 100644
  {
      if (connectionInstance == 0) {
          init();
-@@ -128,6 +129,21 @@ void ConnectionManager::init()
+@@ -123,6 +124,21 @@ void ConnectionManager::init()
  
      SocketConnectionStatus status = setupSocketConnection();
  
@@ -48,7 +48,7 @@ index d08edb6..98ab434 100644
      if (status == SocketConnectionNoService) {
          TRACE() << "Peer connection unavailable, activating service";
          QDBusConnectionInterface *interface =
-@@ -142,11 +158,10 @@ void ConnectionManager::init()
+@@ -137,11 +153,10 @@ void ConnectionManager::init()
                           SIGNAL(finished(QDBusPendingCallWatcher*)),
                           this,
                           SLOT(onActivationDone(QDBusPendingCallWatcher*)));
@@ -62,7 +62,7 @@ index d08edb6..98ab434 100644
          Q_EMIT connected(m_connection);
      }
 diff --git a/lib/SignOn/connection-manager.h b/lib/SignOn/connection-manager.h
-index 4cf7de3..b0ce11b 100644
+index d7d26ad..c1920e8 100644
 --- a/lib/SignOn/connection-manager.h
 +++ b/lib/SignOn/connection-manager.h
 @@ -74,6 +74,7 @@ private Q_SLOTS:
@@ -74,12 +74,12 @@ index 4cf7de3..b0ce11b 100644
  
  }
 diff --git a/lib/SignOn/libsignon-qt.pri b/lib/SignOn/libsignon-qt.pri
-index 0356509..1bcc0d4 100644
+index 1458c50..472fbe8 100644
 --- a/lib/SignOn/libsignon-qt.pri
 +++ b/lib/SignOn/libsignon-qt.pri
-@@ -57,6 +57,10 @@ DEFINES += \
-     QT_NO_CAST_FROM_ASCII \
-     LIBSIGNON_TRACE
+@@ -58,6 +58,10 @@ DEFINES += \
+     QT_NO_CAST_TO_ASCII \
+     QT_NO_CAST_FROM_ASCII
  
 +CONFIG(enable-p2p) {
 +    DEFINES += ENABLE_P2P
@@ -89,5 +89,5 @@ index 0356509..1bcc0d4 100644
  
  headers.files = $$public_headers \
 -- 
-2.20.1
+2.17.1
 

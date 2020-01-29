@@ -1,8 +1,7 @@
 Name:    signon-qt5
-Version: 8.57
-Release: 5
+Version: 8.60
+Release: 1
 Summary: Single Sign On framework
-Group:   System/Libraries
 License: LGPLv2
 URL:     https://gitlab.com/accounts-sso/signond
 Source0: %{name}-%{version}.tar.bz2
@@ -11,14 +10,12 @@ Source1: %{name}.privileges
 Patch1:  0001-disable-multilib.patch
 Patch2:  0002-fix-documentation-path.patch
 Patch3:  0003-Install-tests-add-tests-definition.patch
-Patch4:  0004-Continue-reading-from-plugins-after-handling-respons.patch
-Patch5:  0005-Set-permissions-on-config-dir-correctly.patch
-Patch6:  0006-Initialize-private-member-ptr-in-ctor-to-avoid-crash.patch
-Patch7:  0007-Guard-PendingCall-against-deletion-by-connected-slot.patch
-Patch8:  0008-Add-missing-include.-Contributes-to-JB-35409.patch
-Patch9:  0009-Always-use-P2P-DBus-if-enabled.-Contributes-to-JB-42.patch
-Patch10: 0010-Use-p2p-dbus-for-signon-ui-flows.-Contributes-to-JB-.patch
-Patch11: 0011-Initialize-secrets-db-on-start.-Fixes-JB-34557.patch
+Patch4:  0004-Set-permissions-on-config-dir-correctly.patch
+Patch5:  0005-Guard-PendingCall-against-deletion-by-connected-slot.patch
+Patch6:  0006-Always-use-P2P-DBus-if-enabled.-Contributes-to-JB-42.patch
+Patch7:  0007-Use-p2p-dbus-for-signon-ui-flows.-Contributes-to-JB-.patch
+Patch8:  0008-Initialize-secrets-db-on-start.-Fixes-JB-34557.patch
+Patch9:  0009-Treat-empty-ACL-as-synonym-for-.-Contributes-to-JB-2.patch
 
 BuildRequires: doxygen
 BuildRequires: pkgconfig(Qt5Core)
@@ -45,7 +42,11 @@ Obsoletes: signon
 %{_libdir}/libsignon-extension.so.*
 %{_libdir}/libsignon-plugins-common.so.*
 %{_libdir}/libsignon-plugins.so.*
-%{_datadir}/dbus-1/services/*
+%{_datadir}/dbus-1/services/com.google.code.AccountsSSO.SingleSignOn.service
+%{_datadir}/dbus-1/services/com.nokia.SingleSignOn.Backup.service
+%{_datadir}/dbus-1/interfaces/com.google.code.AccountsSSO.SingleSignOn.AuthService.xml
+%{_datadir}/dbus-1/interfaces/com.google.code.AccountsSSO.SingleSignOn.AuthSession.xml
+%{_datadir}/dbus-1/interfaces/com.google.code.AccountsSSO.SingleSignOn.Identity.xml
 %{_datadir}/mapplauncherd/privileges.d/*
 %config %{_sysconfdir}/signond.conf
 # Own to signon library directory
@@ -95,7 +96,6 @@ Obsoletes: signon-exampleplugin
 
 %package devel
 Summary: Development files for signon
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: signon-devel
 
@@ -120,7 +120,6 @@ Obsoletes: signon-devel
 
 %package -n libsignon-qt5-devel
 Summary: Development files for libsignon-qt
-Group: Development/Libraries
 Requires: libsignon-qt5 = %{version}-%{release}
 
 %description -n libsignon-qt5-devel
@@ -136,7 +135,6 @@ Requires: libsignon-qt5 = %{version}-%{release}
 
 %package doc
 Summary: Documentation for signon
-Group: Documentation
 Obsoletes: signon-doc
 
 %description doc
@@ -151,7 +149,6 @@ Doxygen-generated HTML documentation for the signon.
 
 %package -n libsignon-qt5-doc
 Summary: Documentation for signon-qt
-Group: Documentation
 
 %description -n libsignon-qt5-doc
 Doxygen-generated HTML documentation for the signon-qt
@@ -163,7 +160,6 @@ Doxygen-generated HTML documentation for the signon-qt
 
 %package tests
 Summary: Tests for signon
-Group: System/X11
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-testplugin = %{version}-%{release}
 Obsoletes: signon-tests
@@ -188,8 +184,6 @@ This package contains tests for signon
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
-%patch10 -p1
-%patch11 -p1
 
 chmod +x tests/create-tests-definition.sh
 
@@ -213,3 +207,4 @@ install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
 /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
+

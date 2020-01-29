@@ -1,7 +1,7 @@
-From e405a1c3417725e1135f690f5da973593dcc2060 Mon Sep 17 00:00:00 2001
+From 4b94fac952a1cbd8fa7f2f068e220f09f948ae3d Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Thu, 20 Mar 2014 21:44:25 +1000
-Subject: [PATCH 05/11] Set permissions on config dir correctly
+Subject: [PATCH 4/9] Set permissions on config dir correctly
 
 Also ensure that signond is launched with privileged permissions
 ---
@@ -30,10 +30,10 @@ index 6603fd7..5b5d458 100644
 -Exec=$$INSTALL_PREFIX/bin/signond -backup
 +Exec=/usr/bin/invoker --type=qt5 -d 10 -n $$INSTALL_PREFIX/bin/signond -backup
 diff --git a/src/signond/main.cpp b/src/signond/main.cpp
-index 84751ad..893418d 100644
+index 89192e7..841455b 100644
 --- a/src/signond/main.cpp
 +++ b/src/signond/main.cpp
-@@ -38,7 +38,7 @@ void installSigHandlers()
+@@ -39,7 +39,7 @@ void installSigHandlers()
      sigaction(SIGINT, &act, 0);
  }
  
@@ -43,7 +43,7 @@ index 84751ad..893418d 100644
      QCoreApplication app(argc, argv);
      installSigHandlers();
 diff --git a/src/signond/signond.pro b/src/signond/signond.pro
-index 76de1ea..f8990d8 100644
+index 60ee5e7..f7f83c9 100644
 --- a/src/signond/signond.pro
 +++ b/src/signond/signond.pro
 @@ -8,6 +8,13 @@ QT += core \
@@ -58,8 +58,8 @@ index 76de1ea..f8990d8 100644
 +}
 +
  #generate adaptor for backup
- system(qdbusxml2cpp -c BackupIfAdaptor -a backupifadaptor.h:backupifadaptor.cpp \
-     ../../lib/signond/com.nokia.SingleSignOn.Backup.xml)
+ DBUS_ADAPTORS += \
+     ../../lib/signond/com.nokia.SingleSignOn.Backup.xml
 -- 
-2.20.1
+2.17.1
 

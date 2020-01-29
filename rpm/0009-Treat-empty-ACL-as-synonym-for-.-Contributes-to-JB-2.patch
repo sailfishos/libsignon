@@ -1,0 +1,36 @@
+From 909140c002bcfec081b3b3447ef51303bd11997b Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Mon, 22 Jul 2019 14:00:51 +1000
+Subject: [PATCH 9/9] Treat empty ACL as synonym for "*". Contributes to
+ JB#27876
+
+Prior to 03dd20ef043bd5c1035387998c59312ccc704a59 the ACL was
+bypassed if the identity had no owner.
+With that commit applied, the ACL is enforced even if it had not
+previously been set, making all existing identities inaccessible.
+
+This commit ensures that if the ACL is empty, we treat this as a
+synonym for "*" ACL, allowing the identity to be accessed.
+---
+ src/signond/accesscontrolmanagerhelper.cpp | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/signond/accesscontrolmanagerhelper.cpp b/src/signond/accesscontrolmanagerhelper.cpp
+index 931efc3..40ef357 100644
+--- a/src/signond/accesscontrolmanagerhelper.cpp
++++ b/src/signond/accesscontrolmanagerhelper.cpp
+@@ -91,10 +91,7 @@ bool AccessControlManagerHelper::isPeerAllowedToUseIdentity(
+     if (ownership == ApplicationIsOwner)
+         return true;
+ 
+-    if (acl.isEmpty())
+-        return false;
+-
+-    if (acl.contains(QLatin1String("*")))
++    if (acl.contains(QLatin1String("*")) || acl.isEmpty())
+         return true;
+ 
+     return peerHasOneOfAccesses(peerConnection, peerMessage, acl);
+-- 
+2.17.1
+
