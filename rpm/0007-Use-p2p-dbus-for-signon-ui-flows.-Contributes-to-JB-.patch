@@ -1,7 +1,8 @@
-From 2082fcd65a3021faf3a29de66b9c8ce3dd58b192 Mon Sep 17 00:00:00 2001
+From a41bfe510beb175c88908b807a3aacfa694e928b Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
-Subject: [PATCH 7/9] Use p2p dbus for signon-ui flows. Contributes to JB#42126
+Subject: [PATCH 07/10] Use p2p dbus for signon-ui flows. Contributes to
+ JB#42126
 
 ---
  src/signond/signonidentity.cpp    | 26 ++++++++++++++++++++--
@@ -11,7 +12,7 @@ Subject: [PATCH 7/9] Use p2p dbus for signon-ui flows. Contributes to JB#42126
  4 files changed, 60 insertions(+), 4 deletions(-)
 
 diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
-index ce1ecfb..259b70a 100644
+index a143c22..f0b9b56 100644
 --- a/src/signond/signonidentity.cpp
 +++ b/src/signond/signonidentity.cpp
 @@ -25,6 +25,9 @@
@@ -24,21 +25,22 @@ index ce1ecfb..259b70a 100644
  
  #include "signond-common.h"
  #include "signonidentity.h"
-@@ -84,10 +87,11 @@ private:
+@@ -84,11 +87,12 @@ private:
  SignonIdentity::SignonIdentity(quint32 id, int timeout,
                                 SignonDaemon *parent):
      SignonDisposable(timeout, parent),
 +    m_id(id),
 +    m_p2pc(QStringLiteral("identity.dbus.connection")),
 +    m_signonui(NULL),
-     m_pInfo(NULL)
+     m_pInfo(NULL),
+     m_destroyed(false)
  {
 -    m_id = id;
 -
      (void)new SignonIdentityAdaptor(this);
  
      /*
-@@ -98,10 +102,28 @@ SignonIdentity::SignonIdentity(quint32 id, int timeout,
+@@ -99,10 +103,28 @@ SignonIdentity::SignonIdentity(quint32 id, int timeout,
                           + QString::number(incr++, 16);
      setObjectName(objectName);
  
@@ -68,7 +70,7 @@ index ce1ecfb..259b70a 100644
      /* Watch for credential updates happening outside of this object (this can
       * happen on request of authentication plugins) */
 diff --git a/src/signond/signonidentity.h b/src/signond/signonidentity.h
-index 9ec9be4..ba28a07 100644
+index f6321f3..885cebd 100644
 --- a/src/signond/signonidentity.h
 +++ b/src/signond/signonidentity.h
 @@ -94,6 +94,7 @@ private:
@@ -78,7 +80,7 @@ index 9ec9be4..ba28a07 100644
 +    QDBusConnection m_p2pc;
      SignonUiAdaptor *m_signonui;
      SignonIdentityInfo *m_pInfo;
- }; //class SignonDaemon
+     bool m_destroyed;
 diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
 index b0510db..dca7880 100644
 --- a/src/signond/signonsessioncore.cpp

@@ -1,7 +1,7 @@
-From fdb64a1a51275531a09c1abab5d23f9f1f5cb6c3 Mon Sep 17 00:00:00 2001
+From 951a9f2732bd071a0a37c458a16c580a0fff576c Mon Sep 17 00:00:00 2001
 From: Robin Burchell <robin+git@viroteck.net>
 Date: Thu, 11 Jul 2013 08:51:54 +0000
-Subject: [PATCH 1/9] disable multilib
+Subject: [PATCH 01/10] disable multilib
 
 Mer doesn't use it.
 ---
