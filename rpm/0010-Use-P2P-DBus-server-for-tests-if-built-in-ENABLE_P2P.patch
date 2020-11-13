@@ -1,4 +1,4 @@
-From 3e61cde4207e67405833c64c0b3ad205752f7896 Mon Sep 17 00:00:00 2001
+From b90912d7bbcaaf5269afb57bf9ba7cf201fcb6a0 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Wed, 20 May 2020 16:05:15 +1000
 Subject: [PATCH 10/10] Use P2P DBus server for tests if built in ENABLE_P2P
@@ -16,10 +16,10 @@ removal from daemon).
  5 files changed, 52 insertions(+), 17 deletions(-)
 
 diff --git a/tests/libsignon-qt-tests/libsignon-qt-tests.pro b/tests/libsignon-qt-tests/libsignon-qt-tests.pro
-index 43f2d59..7d8afed 100644
+index 4dd6ce4..fb444e6 100644
 --- a/tests/libsignon-qt-tests/libsignon-qt-tests.pro
 +++ b/tests/libsignon-qt-tests/libsignon-qt-tests.pro
-@@ -15,6 +15,11 @@ LIBS *= -lsignon-qt5
+@@ -14,6 +14,11 @@ LIBS *= -lsignon-qt5
  QMAKE_LIBDIR += $${TOP_BUILD_DIR}/lib/SignOn
  QMAKE_RPATHDIR = $${QMAKE_LIBDIR}
  
@@ -147,7 +147,7 @@ index b242189..8d0b95b 100644
      QString m_replyPassword;
      int m_delay;
 diff --git a/tests/libsignon-qt-tests/ssotestclient.cpp b/tests/libsignon-qt-tests/ssotestclient.cpp
-index 3ad9de3..a89d9ab 100644
+index 619cf9a..ef2b7d1 100644
 --- a/tests/libsignon-qt-tests/ssotestclient.cpp
 +++ b/tests/libsignon-qt-tests/ssotestclient.cpp
 @@ -31,6 +31,7 @@
@@ -158,7 +158,7 @@ index 3ad9de3..a89d9ab 100644
  
  using namespace SignOn;
  
-@@ -1660,7 +1661,13 @@ int main(int argc, char *argv[])
+@@ -1665,7 +1666,13 @@ int main(int argc, char *argv[])
  {
      QCoreApplication app(argc, argv);
  
@@ -173,7 +173,7 @@ index 3ad9de3..a89d9ab 100644
  
      SsoTestClient ssoTestClient(&signOnUI);
 diff --git a/tests/signond-tests/timeouts.cpp b/tests/signond-tests/timeouts.cpp
-index dae8e4b..fb00acd 100644
+index 9a6bc40..0f66967 100644
 --- a/tests/signond-tests/timeouts.cpp
 +++ b/tests/signond-tests/timeouts.cpp
 @@ -33,9 +33,12 @@

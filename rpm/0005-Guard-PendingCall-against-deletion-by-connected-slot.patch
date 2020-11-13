@@ -1,4 +1,4 @@
-From 4cb23e5f68c2ed7d13ce525ca763db7039605c9d Mon Sep 17 00:00:00 2001
+From 8f880a814cc627f5d61e32d0febb352700edfe04 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Fri, 6 Feb 2015 15:39:16 +1000
 Subject: [PATCH 05/10] Guard PendingCall against deletion by connected slots

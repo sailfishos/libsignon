@@ -1,4 +1,4 @@
-From 967093ee60da4b046e7b5b9645ff54d330eaa441 Mon Sep 17 00:00:00 2001
+From 7fc5701b8a1823945f2778aa94a3bd497566ab4e Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Mon, 22 Jul 2019 14:00:51 +1000
 Subject: [PATCH 09/10] Treat empty ACL as synonym for "*". Contributes to
@@ -16,10 +16,10 @@ synonym for "*" ACL, allowing the identity to be accessed.
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/signond/accesscontrolmanagerhelper.cpp b/src/signond/accesscontrolmanagerhelper.cpp
-index 931efc3..40ef357 100644
+index 5403cb2..d7a77b8 100644
 --- a/src/signond/accesscontrolmanagerhelper.cpp
 +++ b/src/signond/accesscontrolmanagerhelper.cpp
-@@ -91,10 +91,7 @@ bool AccessControlManagerHelper::isPeerAllowedToUseIdentity(
+@@ -90,10 +90,7 @@ bool AccessControlManagerHelper::isPeerAllowedToUseIdentity(
      if (ownership == ApplicationIsOwner)
          return true;
  
@@ -30,7 +30,7 @@ index 931efc3..40ef357 100644
 +    if (acl.contains(QLatin1String("*")) || acl.isEmpty())
          return true;
  
-     return peerHasOneOfAccesses(peerConnection, peerMessage, acl);
+     return peerHasOneOfAccesses(peerContext, acl);
 -- 
 2.17.1
 
