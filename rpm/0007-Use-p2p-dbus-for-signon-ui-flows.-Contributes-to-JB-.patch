@@ -1,18 +1,18 @@
-From a41bfe510beb175c88908b807a3aacfa694e928b Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
-Subject: [PATCH 07/10] Use p2p dbus for signon-ui flows. Contributes to
- JB#42126
+Subject: [PATCH] Use p2p dbus for signon-ui flows. Contributes to JB#42126
 
+Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
 ---
- src/signond/signonidentity.cpp    | 26 ++++++++++++++++++++--
+ src/signond/signonidentity.cpp    | 26 +++++++++++++++++++--
  src/signond/signonidentity.h      |  1 +
- src/signond/signonsessioncore.cpp | 36 +++++++++++++++++++++++++++++--
+ src/signond/signonsessioncore.cpp | 38 +++++++++++++++++++++++++++++--
  src/signond/signonsessioncore.h   |  1 +
- 4 files changed, 60 insertions(+), 4 deletions(-)
+ 4 files changed, 62 insertions(+), 4 deletions(-)
 
 diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
-index a143c22..f0b9b56 100644
+index a143c22..1bc3862 100644
 --- a/src/signond/signonidentity.cpp
 +++ b/src/signond/signonidentity.cpp
 @@ -25,6 +25,9 @@
@@ -46,7 +46,7 @@ index a143c22..f0b9b56 100644
  
 +#ifdef ENABLE_P2P
 +    m_p2pc = QDBusConnection::connectToPeer(
-+            QStringLiteral("unix:path=%1/signonui-socket")
++            QStringLiteral("unix:path=%1/signonui/socket")
 +                      .arg(QStandardPaths::writableLocation(
 +                                QStandardPaths::RuntimeLocation)),
 +            objectName);
@@ -82,21 +82,22 @@ index f6321f3..885cebd 100644
      SignonIdentityInfo *m_pInfo;
      bool m_destroyed;
 diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
-index b0510db..dca7880 100644
+index b0510db..0135f12 100644
 --- a/src/signond/signonsessioncore.cpp
 +++ b/src/signond/signonsessioncore.cpp
-@@ -34,6 +34,10 @@
+@@ -34,6 +34,11 @@
  #include "SignOn/authpluginif.h"
  #include "SignOn/signonerror.h"
  
 +#ifdef ENABLE_P2P
 +#include <QStandardPaths>
++#include <QFileInfo>
 +#endif
 +
  #define MAX_IDLE_TIME SIGNOND_MAX_IDLE_TIME
  /*
   * the watchdog searches for idle sessions with period of half of idle timeout
-@@ -77,6 +81,7 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+@@ -77,6 +82,7 @@ SignonSessionCore::SignonSessionCore(quint32 id,
                                       int timeout,
                                       QObject *parent):
      SignonDisposable(timeout, parent),
@@ -104,15 +105,17 @@ index b0510db..dca7880 100644
      m_signonui(0),
      m_watcher(0),
      m_requestIsActive(false),
-@@ -85,10 +90,26 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+@@ -85,10 +91,28 @@ SignonSessionCore::SignonSessionCore(quint32 id,
      m_method(method),
      m_queryCredsUiDisplayed(false)
  {
 +#ifdef ENABLE_P2P
-+    m_p2pc = QDBusConnection::connectToPeer(
-+            QStringLiteral("unix:path=%1/signonui-socket")
++    QString path = QStringLiteral("unix:path=%1/signonui/socket")
 +                      .arg(QStandardPaths::writableLocation(
-+                                QStandardPaths::RuntimeLocation)),
++                                QStandardPaths::RuntimeLocation));
++    // 10 == strlen("unix:path=")
++    QFileInfo(path.mid(10)).dir().mkpath(QStringLiteral("."));
++    m_p2pc = QDBusConnection::connectToPeer(path,
 +            QStringLiteral("signon-session-core-%1").arg(id));
 +    if (!m_p2pc.isConnected()) {
 +        BLAME() << "Session unable to connect to signonui socket:"
@@ -132,7 +135,7 @@ index b0510db..dca7880 100644
  
      connect(CredentialsAccessManager::instance(),
              SIGNAL(credentialsSystemReady()),
-@@ -312,13 +333,24 @@ void SignonSessionCore::setId(quint32 id)
+@@ -312,13 +336,24 @@ void SignonSessionCore::setId(quint32 id)
  
  void SignonSessionCore::startProcess()
  {
@@ -149,7 +152,7 @@ index b0510db..dca7880 100644
 +            data.m_conn, data.m_msg);
 +    parameters.insert(
 +            QStringLiteral("InProcessBusAddress"),
-+            QStringLiteral("unix:path=%1/signonui-%2-socket")
++            QStringLiteral("unix:path=%1/signonui/%2-socket")
 +                      .arg(QStandardPaths::writableLocation(
 +                                QStandardPaths::RuntimeLocation))
 +                      .arg(clientPid));
@@ -171,5 +174,5 @@ index d4a428c..bb0543b 100644
  
      QDBusPendingCallWatcher *m_watcher;
 -- 
-2.17.1
+2.30.2
 

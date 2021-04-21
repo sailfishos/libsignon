@@ -1,12 +1,13 @@
-From 3e61cde4207e67405833c64c0b3ad205752f7896 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Wed, 20 May 2020 16:05:15 +1000
-Subject: [PATCH 10/10] Use P2P DBus server for tests if built in ENABLE_P2P
- mode
+Subject: [PATCH] Use P2P DBus server for tests if built in ENABLE_P2P mode
 
 Also increase timeout of timeouts test, to allow dbus timeout
 to trigger first (required for successful notification of identity
 removal from daemon).
+
+Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
 ---
  .../libsignon-qt-tests/libsignon-qt-tests.pro |  5 +++
  tests/libsignon-qt-tests/signon-ui.cpp        | 40 ++++++++++++++-----
@@ -147,7 +148,7 @@ index b242189..8d0b95b 100644
      QString m_replyPassword;
      int m_delay;
 diff --git a/tests/libsignon-qt-tests/ssotestclient.cpp b/tests/libsignon-qt-tests/ssotestclient.cpp
-index 3ad9de3..a89d9ab 100644
+index 3ad9de3..ef1ef54 100644
 --- a/tests/libsignon-qt-tests/ssotestclient.cpp
 +++ b/tests/libsignon-qt-tests/ssotestclient.cpp
 @@ -31,6 +31,7 @@
@@ -163,7 +164,7 @@ index 3ad9de3..a89d9ab 100644
      QCoreApplication app(argc, argv);
  
 +#ifdef ENABLE_P2P
-+    QDBusServer p2pBus(QStringLiteral("unix:path=%1/signonui-socket").arg(QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation)));
++    QDBusServer p2pBus(QStringLiteral("unix:path=%1/signonui/socket").arg(QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation)));
 +    SignOnUI signOnUI(&p2pBus);
 +#else
      SignOnUI signOnUI(QDBusConnection::sessionBus());
@@ -192,5 +193,5 @@ index dae8e4b..fb00acd 100644
  
  void TimeoutsTest::initTestCase()
 -- 
-2.17.1
+2.30.2
 
