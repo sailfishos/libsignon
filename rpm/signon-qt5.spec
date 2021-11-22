@@ -32,13 +32,13 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(qt5-boostable)
 BuildRequires: fdupes
 Requires: mapplauncherd-qt5
-Obsoletes: signon
 
 %description
 %{summary}.
 
 %files
 %defattr(-,root,root,-)
+%license COPYING
 %{_bindir}/*
 %{_libdir}/libsignon-extension.so.*
 %{_libdir}/libsignon-plugins-common.so.*
@@ -54,7 +54,6 @@ Obsoletes: signon
 %dir %{_libdir}/signon
 %{_libdir}/signon/libpasswordplugin.so
 %attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
-%license COPYING
 
 %package -n libsignon-qt5
 Summary: Single Sign On Qt library
@@ -65,6 +64,7 @@ Requires: %{name} = %{version}-%{release}
 
 %files -n libsignon-qt5
 %defattr(-,root,root,-)
+%license COPYING
 %{_libdir}/libsignon-qt5.so.*
 
 %post -n libsignon-qt5 -p /sbin/ldconfig
@@ -73,7 +73,6 @@ Requires: %{name} = %{version}-%{release}
 %package testplugin
 Summary: Single Sign On test plugins
 Requires: %{name} = %{version}-%{release}
-Obsoletes: signon-testplugin
 
 %description testplugin
 %{summary}.
@@ -85,7 +84,6 @@ Obsoletes: signon-testplugin
 %package exampleplugin
 Summary: Single Sign On example client
 Requires: %{name} = %{version}-%{release}
-Obsoletes: signon-exampleplugin
 
 %description exampleplugin
 %{summary}.
@@ -98,7 +96,6 @@ Obsoletes: signon-exampleplugin
 %package devel
 Summary: Development files for signon
 Requires: %{name} = %{version}-%{release}
-Obsoletes: signon-devel
 
 %description devel
 %{summary}.
@@ -136,7 +133,6 @@ Requires: libsignon-qt5 = %{version}-%{release}
 
 %package doc
 Summary: Documentation for signon
-Obsoletes: signon-doc
 
 %description doc
 Doxygen-generated HTML documentation for the signon.
@@ -163,7 +159,6 @@ Doxygen-generated HTML documentation for the signon-qt
 Summary: Tests for signon
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-testplugin = %{version}-%{release}
-Obsoletes: signon-tests
 
 %description tests
 This package contains tests for signon
@@ -174,18 +169,7 @@ This package contains tests for signon
 
 
 %prep
-%setup -q -n %{name}-%{version}/upstream
-
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 chmod +x tests/create-tests-definition.sh
 
