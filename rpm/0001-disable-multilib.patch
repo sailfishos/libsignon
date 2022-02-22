@@ -1,7 +1,7 @@
-From 951a9f2732bd071a0a37c458a16c580a0fff576c Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Robin Burchell <robin+git@viroteck.net>
 Date: Thu, 11 Jul 2013 08:51:54 +0000
-Subject: [PATCH 01/10] disable multilib
+Subject: [PATCH] disable multilib
 
 Mer doesn't use it.
 ---
@@ -24,5 +24,5 @@ index 606f70b..da2fd86 100644
  # default library directory can be overriden by defining LIBDIR when
  # running qmake
 -- 
-2.17.1
+2.35.1
 

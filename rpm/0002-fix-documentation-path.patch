@@ -1,7 +1,7 @@
-From 3ec1fc862a2568a38e30045db0c182eb7ebcf81f Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Robin Burchell <robin+git@viroteck.net>
 Date: Thu, 11 Jul 2013 08:53:06 +0000
-Subject: [PATCH 02/10] fix documentation path
+Subject: [PATCH] fix documentation path
 
 ---
  lib/SignOn/doc/doc.pri | 2 +-
@@ -21,5 +21,5 @@ index 46f1148..3f2a96b 100644
      documentation.files += $${folder}
  }
 -- 
-2.17.1
+2.35.1
 

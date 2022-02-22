@@ -2,14 +2,17 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Chris Adams <chris.adams@jollamobile.com>
 Date: Tue, 19 Jun 2018 13:15:36 +1000
 Subject: [PATCH] Use p2p dbus for signon-ui flows. Contributes to JB#42126
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
 ---
  src/signond/signonidentity.cpp    | 26 +++++++++++++++++++--
  src/signond/signonidentity.h      |  1 +
- src/signond/signonsessioncore.cpp | 38 +++++++++++++++++++++++++++++--
+ src/signond/signonsessioncore.cpp | 39 +++++++++++++++++++++++++++++--
  src/signond/signonsessioncore.h   |  1 +
- 4 files changed, 62 insertions(+), 4 deletions(-)
+ 4 files changed, 63 insertions(+), 4 deletions(-)
 
 diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
 index a143c22..1bc3862 100644
@@ -82,7 +85,7 @@ index f6321f3..885cebd 100644
      SignonIdentityInfo *m_pInfo;
      bool m_destroyed;
 diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
-index b0510db..0135f12 100644
+index b0510db..9ef4b57 100644
 --- a/src/signond/signonsessioncore.cpp
 +++ b/src/signond/signonsessioncore.cpp
 @@ -34,6 +34,11 @@
@@ -174,5 +177,5 @@ index d4a428c..bb0543b 100644
  
      QDBusPendingCallWatcher *m_watcher;
 -- 
-2.30.2
+2.35.1
 
