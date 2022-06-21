@@ -3,7 +3,7 @@ Version: 8.60
 Release: 1
 Summary: Single Sign On framework
 License: LGPLv2
-URL:     https://gitlab.com/accounts-sso/signond
+URL:     https://github.com/sailfishos/libsignon
 Source0: %{name}-%{version}.tar.bz2
 Source1: %{name}.privileges
 
