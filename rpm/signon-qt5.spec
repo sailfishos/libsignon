@@ -17,6 +17,7 @@ Patch7:  0007-Use-p2p-dbus-for-signon-ui-flows.-Contributes-to-JB-.patch
 Patch8:  0008-Initialize-secrets-db-on-start.-Fixes-JB-34557.patch
 Patch9:  0009-Treat-empty-ACL-as-synonym-for-.-Contributes-to-JB-2.patch
 Patch10: 0010-Use-P2P-DBus-server-for-tests-if-built-in-ENABLE_P2P.patch
+Patch11: 0011-Increase-maximum-token-storage-size.patch
 
 BuildRequires: doxygen
 BuildRequires: pkgconfig(Qt5Core)
