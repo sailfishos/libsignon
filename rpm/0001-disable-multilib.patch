@@ -9,10 +9,10 @@ Mer doesn't use it.
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/common-project-config.pri b/common-project-config.pri
-index 606f70b..da2fd86 100644
+index abe6cf6..9d548e4 100644
 --- a/common-project-config.pri
 +++ b/common-project-config.pri
-@@ -57,9 +57,7 @@ exists( meego-release ) {
+@@ -55,9 +55,7 @@ exists( meego-release ) {
      ARCH = $$system(uname -m)
  }
  
@@ -23,6 +23,3 @@ index 606f70b..da2fd86 100644
  
  # default library directory can be overriden by defining LIBDIR when
  # running qmake
--- 
-2.35.1
-

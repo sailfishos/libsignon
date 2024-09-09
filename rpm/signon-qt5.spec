@@ -1,5 +1,5 @@
 Name:    signon-qt5
-Version: 8.60
+Version: 8.61
 Release: 1
 Summary: Single Sign On framework
 License: LGPLv2
@@ -37,8 +37,89 @@ Requires: mapplauncherd-qt5
 %description
 %{summary}.
 
+%package -n libsignon-qt5
+Summary: Single Sign On Qt library
+Requires: %{name} = %{version}-%{release}
+
+%description -n libsignon-qt5
+%{summary}.
+
+%package testplugin
+Summary: Single Sign On test plugins
+Requires: %{name} = %{version}-%{release}
+
+%description testplugin
+%{summary}.
+
+%package exampleplugin
+Summary: Single Sign On example client
+Requires: %{name} = %{version}-%{release}
+
+%description exampleplugin
+%{summary}.
+
+%package devel
+Summary: Development files for signon
+Requires: %{name} = %{version}-%{release}
+
+%description devel
+%{summary}.
+
+%package -n libsignon-qt5-devel
+Summary: Development files for libsignon-qt
+Requires: libsignon-qt5 = %{version}-%{release}
+
+%description -n libsignon-qt5-devel
+%{summary}.
+
+%package doc
+Summary: Documentation for signon
+
+%description doc
+Doxygen-generated HTML documentation for the signon.
+
+%package -n libsignon-qt5-doc
+Summary: Documentation for signon-qt
+
+%description -n libsignon-qt5-doc
+Doxygen-generated HTML documentation for the signon-qt
+
+%package tests
+Summary: Tests for signon
+Requires: %{name} = %{version}-%{release}
+Requires: %{name}-testplugin = %{version}-%{release}
+
+%description tests
+This package contains tests for signon
+
+
+%prep
+%autosetup -p1 -n %{name}-%{version}/upstream
+
+chmod +x tests/create-tests-definition.sh
+
+%build
+%qmake5 TESTDIR=/opt/tests/signon CONFIG+=install_tests CONFIG+=enable-p2p
+%make_build
+
+%install
+%qmake5_install
+rm -f %{buildroot}/%{_docdir}/libsignon-qt/html/installdox
+rm -f %{buildroot}/%{_docdir}/signon/html/installdox
+rm -f %{buildroot}/%{_docdir}/signon-plugins/html/installdox
+rm -f %{buildroot}/%{_docdir}/saslplugin/html/installdox
+%fdupes %{buildroot}/%{_docdir}
+
+mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
+
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%post -n libsignon-qt5 -p /sbin/ldconfig
+%postun -n libsignon-qt5 -p /sbin/ldconfig
+
 %files
-%defattr(-,root,root,-)
 %license COPYING
 %{_bindir}/*
 %{_libdir}/libsignon-extension.so.*
@@ -56,53 +137,17 @@ Requires: mapplauncherd-qt5
 %{_libdir}/signon/libpasswordplugin.so
 %attr(4710, root, privileged) %{_libexecdir}/signon-storage-perm
 
-%package -n libsignon-qt5
-Summary: Single Sign On Qt library
-Requires: %{name} = %{version}-%{release}
-
-%description -n libsignon-qt5
-%{summary}.
-
 %files -n libsignon-qt5
-%defattr(-,root,root,-)
 %license COPYING
 %{_libdir}/libsignon-qt5.so.*
 
-%post -n libsignon-qt5 -p /sbin/ldconfig
-%postun -n libsignon-qt5 -p /sbin/ldconfig
-
-%package testplugin
-Summary: Single Sign On test plugins
-Requires: %{name} = %{version}-%{release}
-
-%description testplugin
-%{summary}.
-
 %files testplugin
-%defattr(-,root,root,-)
 %{_libdir}/signon/libssotest*.so
 
-%package exampleplugin
-Summary: Single Sign On example client
-Requires: %{name} = %{version}-%{release}
-
-%description exampleplugin
-%{summary}.
-
 %files exampleplugin
-%defattr(-,root,root,-)
 %{_libdir}/signon/libexampleplugin.so
 
-
-%package devel
-Summary: Development files for signon
-Requires: %{name} = %{version}-%{release}
-
-%description devel
-%{summary}.
-
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/signond
 %{_includedir}/signon-extension
 %{_includedir}/signon-plugins
@@ -116,82 +161,19 @@ Requires: %{name} = %{version}-%{release}
 %{_libdir}/cmake/SignOnQt5
 %{_datadir}/dbus-1/interfaces/*
 
-
-%package -n libsignon-qt5-devel
-Summary: Development files for libsignon-qt
-Requires: libsignon-qt5 = %{version}-%{release}
-
-%description -n libsignon-qt5-devel
-%{summary}.
-
 %files -n libsignon-qt5-devel
-%defattr(-,root,root,-)
 %{_includedir}/signon-qt5
 %{_libdir}/libsignon-qt5.so
 %exclude %{_libdir}/libsignon-qt5.a
 %{_libdir}/pkgconfig/libsignon-qt5.pc
 
-
-%package doc
-Summary: Documentation for signon
-
-%description doc
-Doxygen-generated HTML documentation for the signon.
-
 %files doc
-%defattr(-,root,root,-)
 %{_docdir}/signon
 %{_docdir}/signon-plugins-dev
 %{_docdir}/signon-plugins
 
-
-%package -n libsignon-qt5-doc
-Summary: Documentation for signon-qt
-
-%description -n libsignon-qt5-doc
-Doxygen-generated HTML documentation for the signon-qt
-
 %files -n libsignon-qt5-doc
-%defattr(-,root,root,-)
 %{_docdir}/libsignon-qt5
 
-
-%package tests
-Summary: Tests for signon
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-testplugin = %{version}-%{release}
-
-%description tests
-This package contains tests for signon
-
 %files tests
-%defattr(-,root,root,-)
 /opt/tests/signon
-
-
-%prep
-%autosetup -p1 -n %{name}-%{version}/upstream
-
-chmod +x tests/create-tests-definition.sh
-
-%build
-%qmake5 TESTDIR=/opt/tests/signon CONFIG+=install_tests CONFIG+=enable-p2p
-make %{?_smp_mflags}
-
-
-%install
-%qmake5_install
-rm -f %{buildroot}/%{_docdir}/libsignon-qt/html/installdox
-rm -f %{buildroot}/%{_docdir}/signon/html/installdox
-rm -f %{buildroot}/%{_docdir}/signon-plugins/html/installdox
-rm -f %{buildroot}/%{_docdir}/saslplugin/html/installdox
-%fdupes %{buildroot}/%{_docdir}
-
-mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
-install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d/
-
-%post
-/sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-

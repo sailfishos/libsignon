@@ -20,6 +20,3 @@ index 46f1148..3f2a96b 100644
  for( folder, DOC_FOLDERS ) {
      documentation.files += $${folder}
  }
--- 
-2.35.1
-

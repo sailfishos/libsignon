@@ -88,6 +88,3 @@ index 1458c50..472fbe8 100644
  include( $$TOP_SRC_DIR/common-installs-config.pri )
  
  headers.files = $$public_headers \
--- 
-2.35.1
-
