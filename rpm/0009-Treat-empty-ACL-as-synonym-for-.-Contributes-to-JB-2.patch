@@ -15,10 +15,10 @@ synonym for "*" ACL, allowing the identity to be accessed.
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/signond/accesscontrolmanagerhelper.cpp b/src/signond/accesscontrolmanagerhelper.cpp
-index 931efc3..40ef357 100644
+index 5403cb2..d7a77b8 100644
 --- a/src/signond/accesscontrolmanagerhelper.cpp
 +++ b/src/signond/accesscontrolmanagerhelper.cpp
-@@ -91,10 +91,7 @@ bool AccessControlManagerHelper::isPeerAllowedToUseIdentity(
+@@ -90,10 +90,7 @@ bool AccessControlManagerHelper::isPeerAllowedToUseIdentity(
      if (ownership == ApplicationIsOwner)
          return true;
  
@@ -29,7 +29,4 @@ index 931efc3..40ef357 100644
 +    if (acl.contains(QLatin1String("*")) || acl.isEmpty())
          return true;
  
-     return peerHasOneOfAccesses(peerConnection, peerMessage, acl);
--- 
-2.35.1
-
+     return peerHasOneOfAccesses(peerContext, acl);

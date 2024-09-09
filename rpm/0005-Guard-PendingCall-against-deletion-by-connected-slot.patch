@@ -43,6 +43,3 @@ index 8656e48..94db648 100644
  }
  
  void PendingCall::onInterfaceDestroyed()
--- 
-2.35.1
-

@@ -192,6 +192,3 @@ index 64c59c1..656391e 100644
  SUBDIRS += \
      passwordplugintest \
      libsignon-qt-tests \
--- 
-2.35.1
-
