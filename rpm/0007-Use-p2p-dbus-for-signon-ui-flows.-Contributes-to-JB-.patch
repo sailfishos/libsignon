@@ -10,12 +10,12 @@ Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
 ---
  src/signond/signonidentity.cpp    | 27 ++++++++++++++++++++--
  src/signond/signonidentity.h      |  1 +
- src/signond/signonsessioncore.cpp | 38 +++++++++++++++++++++++++++++--
+ src/signond/signonsessioncore.cpp | 37 ++++++++++++++++++++++++++++++-
  src/signond/signonsessioncore.h   |  1 +
- 4 files changed, 63 insertions(+), 4 deletions(-)
+ 4 files changed, 63 insertions(+), 3 deletions(-)
 
 diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
-index 92ff476..2c7216b 100644
+index e15a728..ab8a10c 100644
 --- a/src/signond/signonidentity.cpp
 +++ b/src/signond/signonidentity.cpp
 @@ -23,6 +23,10 @@
@@ -60,21 +60,21 @@ index 92ff476..2c7216b 100644
 +                << m_p2pc.lastError().type()
 +                << m_p2pc.lastError().name();
 +    }
-+    m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
-+                                     SIGNON_UI_DAEMON_OBJECTPATH,
-+                                     m_p2pc,
-+                                     this);
++    m_signonui = new SignonUiInterface(SIGNON_UI_SERVICE,
++                                       SIGNON_UI_DAEMON_OBJECTPATH,
++                                       m_p2pc,
++                                       this);
 +#else
-     m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
-                                      SIGNON_UI_DAEMON_OBJECTPATH,
-                                      QDBusConnection::sessionBus(),
-                                      this);
+     m_signonui = new SignonUiInterface(SIGNON_UI_SERVICE,
+                                        SIGNON_UI_DAEMON_OBJECTPATH,
+                                        QDBusConnection::sessionBus(),
+                                        this);
 +#endif
  
      /* Watch for credential updates happening outside of this object (this can
       * happen on request of authentication plugins) */
 diff --git a/src/signond/signonidentity.h b/src/signond/signonidentity.h
-index 417c319..0f5fc78 100644
+index 4709aa5..a26166e 100644
 --- a/src/signond/signonidentity.h
 +++ b/src/signond/signonidentity.h
 @@ -109,6 +109,7 @@ private:
@@ -82,11 +82,11 @@ index 417c319..0f5fc78 100644
  private:
      quint32 m_id;
 +    QDBusConnection m_p2pc;
-     SignonUiAdaptor *m_signonui;
+     SignonUiInterface *m_signonui;
      SignonIdentityInfo *m_pInfo;
      bool m_destroyed;
 diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
-index 93a7328..1877ad5 100644
+index 8aa59fa..b8bb7f7 100644
 --- a/src/signond/signonsessioncore.cpp
 +++ b/src/signond/signonsessioncore.cpp
 @@ -35,6 +35,11 @@
@@ -109,7 +109,7 @@ index 93a7328..1877ad5 100644
      m_signonui(0),
      m_watcher(0),
      m_requestIsActive(false),
-@@ -86,10 +92,28 @@ SignonSessionCore::SignonSessionCore(quint32 id,
+@@ -86,9 +92,28 @@ SignonSessionCore::SignonSessionCore(quint32 id,
      m_method(method),
      m_queryCredsUiDisplayed(false)
  {
@@ -127,19 +127,18 @@ index 93a7328..1877ad5 100644
 +                << m_p2pc.lastError().type()
 +                << m_p2pc.lastError().name();
 +    }
-+    m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
-+                                     SIGNON_UI_DAEMON_OBJECTPATH,
-+                                     m_p2pc);
++    m_signonui = new SignonUiInterface(SIGNON_UI_SERVICE,
++                                       SIGNON_UI_DAEMON_OBJECTPATH,
++                                       m_p2pc);
 +#else
-     m_signonui = new SignonUiAdaptor(SIGNON_UI_SERVICE,
-                                      SIGNON_UI_DAEMON_OBJECTPATH,
-                                      QDBusConnection::sessionBus());
--
+     m_signonui = new SignonUiInterface(SIGNON_UI_SERVICE,
+                                        SIGNON_UI_DAEMON_OBJECTPATH,
+                                        QDBusConnection::sessionBus());
 +#endif
  
      connect(CredentialsAccessManager::instance(),
              SIGNAL(credentialsSystemReady()),
-@@ -309,13 +333,23 @@ void SignonSessionCore::setId(quint32 id)
+@@ -308,13 +333,23 @@ void SignonSessionCore::setId(quint32 id)
  
  void SignonSessionCore::startProcess()
  {
@@ -165,7 +164,7 @@ index 93a7328..1877ad5 100644
       * of this request */
      m_clientData = parameters;
 diff --git a/src/signond/signonsessioncore.h b/src/signond/signonsessioncore.h
-index 6d26b24..48a2f4d 100644
+index 552229f..858c19c 100644
 --- a/src/signond/signonsessioncore.h
 +++ b/src/signond/signonsessioncore.h
 @@ -132,6 +132,7 @@ private:
@@ -173,6 +172,6 @@ index 6d26b24..48a2f4d 100644
      PluginProxy *m_plugin;
      QQueue<RequestData> m_listOfRequests;
 +    QDBusConnection m_p2pc;
-     SignonUiAdaptor *m_signonui;
+     SignonUiInterface *m_signonui;
  
      QDBusPendingCallWatcher *m_watcher;

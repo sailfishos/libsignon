@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pekka Vuorela <pekka.vuorela@jolla.com>
+Date: Fri, 6 Mar 2026 10:29:59 +0200
+Subject: [PATCH] Implement an alternative to upstream data reading fix
+
+Commit 4c182d24f552a introduced some protection against Qt serializing
+QByteArray with two writes, first the size and then the content.
+Unfortunately QDataStream::startTransaction() was introduced in Qt 5.7
+so can't use that now.
+
+Fixed compilation with older Qt and implemented an alternative.
+
+Disclaimer: not able to trigger the problem, but think the variant
+should more or less match upstream behavior. receiveData()
+followed by readBlob() with small enough sizes assumes
+handling a full blob.
+---
+ .../signon-plugins-common/SignOn/blobiohandler.cpp | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
+index cff9c39..cb00e53 100644
+--- a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
++++ b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
+@@ -109,18 +109,32 @@ void BlobIOHandler::receiveData(int expectedDataSize)
+ 
+ void BlobIOHandler::readBlob()
+ {
++ #if (QT_VERSION < QT_VERSION_CHECK(5,7,0))
++    if (m_readChannel->bytesAvailable() <= 4
++            || (!m_isReading && m_readChannel->bytesAvailable() < m_blobSize)) {
++        qWarning() << "Signon: not enough readable data to parse, waiting for more."
++                   << m_readChannel->bytesAvailable() << "vs" << m_blobSize
++                   << "(expecting all at once" << m_isReading << ")";
++        setReadNotificationEnabled(true);
++        return;
++    }
++#endif
+     QDataStream in(m_readChannel);
+ 
++#if (QT_VERSION >= QT_VERSION_CHECK(5,7,0))
+     in.startTransaction();
++#endif
+     QByteArray fractionBa;
+     in >> fractionBa;
+ 
++#if (QT_VERSION >= QT_VERSION_CHECK(5,7,0))
+     if (!in.commitTransaction()) {
+         setReadNotificationEnabled(true);
+         // FIXME: with next ABI break, add a timer to prevent infinite waiting
+         // if the other party behaves badly
+         return;
+     }
++#endif
+ 
+     m_blobBuffer.append(fractionBa);
+ 
