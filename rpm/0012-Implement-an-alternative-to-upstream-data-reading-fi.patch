@@ -19,10 +19,10 @@ handling a full blob.
  1 file changed, 14 insertions(+)
 
 diff --git a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
-index cff9c39..cb00e53 100644
+index f20d11d..0f23cf4 100644
 --- a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
 +++ b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
-@@ -109,18 +109,32 @@ void BlobIOHandler::receiveData(int expectedDataSize)
+@@ -110,18 +110,32 @@ void BlobIOHandler::receiveData(int expectedDataSize)
  
  void BlobIOHandler::readBlob()
  {

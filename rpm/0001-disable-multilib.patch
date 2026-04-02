@@ -9,10 +9,10 @@ Mer doesn't use it.
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/common-project-config.pri b/common-project-config.pri
-index abe6cf6..9d548e4 100644
+index c8e23f9..6577539 100644
 --- a/common-project-config.pri
 +++ b/common-project-config.pri
-@@ -55,9 +55,7 @@ exists( meego-release ) {
+@@ -53,9 +53,7 @@ exists( meego-release ) {
      ARCH = $$system(uname -m)
  }
  
