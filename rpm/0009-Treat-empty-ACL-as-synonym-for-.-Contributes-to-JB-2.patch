@@ -15,7 +15,7 @@ synonym for "*" ACL, allowing the identity to be accessed.
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/signond/accesscontrolmanagerhelper.cpp b/src/signond/accesscontrolmanagerhelper.cpp
-index 5403cb2..d7a77b8 100644
+index f3ddefa..611a7ae 100644
 --- a/src/signond/accesscontrolmanagerhelper.cpp
 +++ b/src/signond/accesscontrolmanagerhelper.cpp
 @@ -90,10 +90,7 @@ bool AccessControlManagerHelper::isPeerAllowedToUseIdentity(

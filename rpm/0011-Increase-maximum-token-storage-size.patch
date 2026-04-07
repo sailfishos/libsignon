@@ -15,7 +15,7 @@ Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/signond/credentialsdb.h b/src/signond/credentialsdb.h
-index d903f86..1417702 100644
+index 96d09bf..fde3b1c 100644
 --- a/src/signond/credentialsdb.h
 +++ b/src/signond/credentialsdb.h
 @@ -36,7 +36,7 @@
